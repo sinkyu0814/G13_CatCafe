@@ -28,7 +28,7 @@
 		<c:forEach var="m" items="${menuList}">
 			<div class="menu-item">
 				<a href="ConfirmServlet?id=${m.id}"> <img
-					src="assets/images/${m.img}" width="150">
+					src="${pageContext.request.contextPath}/assets/images/${m.img}">
 					<p>${m.name}</p>
 					<p>${m.price}円</p>
 				</a>

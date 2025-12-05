@@ -1,0 +1,31 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>メインメニュー</title>
+</head>
+<body>
+
+	<h1>システムメイン画面</h1>
+
+	<!-- お客様用画面 -->
+	<form action="ToppageServlet" method="get">
+		<button type="submit">お客様用画面へ</button>
+	</form>
+	<br>
+
+	<!-- キッチン用画面 -->
+	<form action="KitchenOrderServlet" method="get">
+		<button type="submit">キッチン画面へ</button>
+	</form>
+	<br>
+
+	<!-- 従業員用（管理用）画面 -->
+	<form action="AddMenuServlet" method="get">
+		<button type="submit">管理(Menu登録)画面へ</button>
+	</form>
+
+</body>
+</html>

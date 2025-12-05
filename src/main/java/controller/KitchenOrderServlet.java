@@ -5,12 +5,13 @@ import java.util.List;
 
 import database.KitchenOrderDAO;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.dto.KitchenOrderDTO;
 
-//@WebServlet("/KitchenOrderServlet")
+@WebServlet("/KitchenOrderServlet")
 /**
  * Servlet implementation class KitchenOrderServlet
  */
