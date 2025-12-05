@@ -13,7 +13,9 @@
 	<c:if test="${not empty error}">
 		<p style="color: red;">${error}</p>
 	</c:if>
-
+	<c:if test="${not empty success}">
+		<p style="color: green;">${success}</p>
+	</c:if>
 	<form action="${pageContext.request.contextPath}/AddMenuServlet"
 		method="post" enctype="multipart/form-data">
 		<label>メニュー名: <input type="text" name="name" required></label><br>

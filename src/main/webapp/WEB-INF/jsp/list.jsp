@@ -18,7 +18,6 @@
 		<button name="category" value="Sweets">スイーツ</button>
 		<button name="category" value="SoftDrink">ソフトドリンク</button>
 		<button name="category" value="Morning">モーニング</button>
-		<button name="category" value="all">すべて</button>
 	</form>
 	<hr>
 

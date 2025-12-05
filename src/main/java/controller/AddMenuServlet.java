@@ -98,7 +98,7 @@ public class AddMenuServlet extends HttpServlet {
 			dao.addMenu(name, price, quantity, category, fileName);
 
 			// 完了メッセージ
-			request.setAttribute("message", "メニューを追加しました！");
+			request.setAttribute("success", "メニューを追加しました！");
 			request.getRequestDispatcher("/WEB-INF/jsp/addMenu.jsp").forward(request, response);
 
 		} catch (NumberFormatException e) {

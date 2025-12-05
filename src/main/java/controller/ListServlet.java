@@ -39,7 +39,7 @@ public class ListServlet extends HttpServlet {
 	    request.setAttribute("persons", persons);
 
 	    String category = request.getParameter("category");
-	    if (category == null) category = "all";
+	    if (category == null) category = "Recomend";
 
 	    model.service.MenuService service = new MenuService();
 
@@ -61,7 +61,7 @@ public class ListServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		doGet(request, response);
+//		doGet(request, response);
 	}
 
 }
