@@ -1,0 +1,20 @@
+# ビルド成果物は無視
+bin/
+build/
+target/
+*.class
+*.log
+
+# OS/一時ファイル
+.DS_Store
+*.swp
+*.swo
+*.tmp
+
+# IDE系（必要なもの以外を無視）
+# → Eclipseの .project / .classpath / .settings は **含める**
+
+# IntelliJやVSCodeの設定は無視（使ってなければ不要だけど一応）
+.idea/
+*.iml
+.vscode/
