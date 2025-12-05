@@ -28,7 +28,8 @@
 		<c:forEach var="m" items="${menuList}">
 			<div class="menu-item">
 				<a href="ConfirmServlet?id=${m.id}"> <img
-					src="${pageContext.request.contextPath}/assets/images/${m.img}">
+					src="${pageContext.request.contextPath}/assets/images/${m.img}"
+					width="150">
 					<p>${m.name}</p>
 					<p>${m.price}円</p>
 				</a>
@@ -41,7 +42,7 @@
 		<h3>カート</h3>
 		<c:if test="${not empty cart}">
 			<c:forEach var="c" items="${cart}">
-				<div>${c.goodsName}× ${c.quantity} (${c.totalPrice}円)</div>
+				<div>${c.goodsName}×${c.quantity}(${c.totalPrice}円)</div>
 			</c:forEach>
 		</c:if>
 		<hr>
