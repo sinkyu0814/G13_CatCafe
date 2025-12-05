@@ -5,13 +5,12 @@ import java.util.List;
 
 import database.CartDAO;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import viewmodel.CartItem;
-@WebServlet("/ConfirmOrderServlet")
+//@WebServlet("/ConfirmOrderServlet")
 public class ConfirmOrderServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
