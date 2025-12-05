@@ -10,14 +10,17 @@ import java.time.format.DateTimeFormatter;
 import database.MenuDAO;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
+
 //@WebServlet("/AddMenuServlet")
 /**
  * Servlet implementation class AddMenuServlet
  */
+@MultipartConfig
 public class AddMenuServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	// webapp/assets/images/ に保存する設定（先頭に / が必要）
