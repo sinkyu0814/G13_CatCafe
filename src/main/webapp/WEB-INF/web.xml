@@ -79,4 +79,44 @@
     <servlet-name>CartAddServlet</servlet-name>
     <url-pattern>/CartAddServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>AccountingServlet</display-name>
+    <servlet-name>AccountingServlet</servlet-name>
+    <servlet-class>controller.AccountingServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AccountingServlet</servlet-name>
+    <url-pattern>/AccountingServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>CheckoutServlet</display-name>
+    <servlet-name>CheckoutServlet</servlet-name>
+    <servlet-class>controller.CheckoutServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CheckoutServlet</servlet-name>
+    <url-pattern>/CheckoutServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>CheckServlet</display-name>
+    <servlet-name>CheckServlet</servlet-name>
+    <servlet-class>controller.CheckServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CheckServlet</servlet-name>
+    <url-pattern>/CheckServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>HistoryServlet</display-name>
+    <servlet-name>HistoryServlet</servlet-name>
+    <servlet-class>controller.HistoryServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HistoryServlet</servlet-name>
+    <url-pattern>/HistoryServlet</url-pattern>
+  </servlet-mapping>
 </web-app>
