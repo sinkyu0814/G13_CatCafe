@@ -79,7 +79,7 @@ public class MenuDAO {
 	}
 
 	// -----------------------------------------------------
-	// ★カテゴリ一覧 ← これが消えていた
+	// ★カテゴリ一覧 
 	// -----------------------------------------------------
 	public List<String> getCategoryList() {
 		List<String> list = new ArrayList<>();

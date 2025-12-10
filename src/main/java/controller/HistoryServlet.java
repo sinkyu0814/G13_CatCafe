@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import model.dto.MenuDTO;
+import viewmodel.CartItem;
 
 /**
  * Servlet implementation class HistoryServlet
@@ -34,32 +34,31 @@ public class HistoryServlet extends HttpServlet {
 		//response.getWriter().append("Served at: ").append(request.getContextPath());
 		HttpSession session = request.getSession();
 
-		// --- 1. データ取得（セッションからカートを取得） ---
-		// カート情報（List<MenuDTO>）がセッションの "cart" 属性に保存されていると仮定
+		// --- 1. カート取得 ---
 		@SuppressWarnings("unchecked")
-		List<MenuDTO> orderedItems = (List<MenuDTO>) session.getAttribute("cart");
+		List<CartItem> orderedItems = (List<CartItem>) session.getAttribute("cart");
 
-		// カートが空の場合は、空のリストを作成
 		if (orderedItems == null) {
-			// Serviceはnullを受け取れないため、空リストで初期化
 			orderedItems = java.util.Collections.emptyList();
 		}
 
-		// --- 2. データ処理（Serviceによる計算） ---
-		int totalAmount = menuService.calculateTotal(orderedItems);
+		// --- 2. 合計金額計算 ---
+		int totalAmount = 0;
+		for (CartItem item : orderedItems) {
+			totalAmount += item.getTotalPrice();
+		}
 
-		// ※ 栄養素合計はここでは単純なダミーMapで代用
+		// --- 3. ダミー栄養データ ---
 		java.util.Map<String, String> nutritionData = new java.util.HashMap<>();
 		nutritionData.put("calories", "1,200kcal");
 		nutritionData.put("protein", "45g");
 
-		// --- 3. データをリクエストスコープに格納 ---
+		// --- 4. リクエストへセット ---
 		request.setAttribute("orderItems", orderedItems);
 		request.setAttribute("totalAmount", totalAmount);
-		request.setAttribute("nutritionData", nutritionData); // 栄養素データ
+		request.setAttribute("nutritionData", nutritionData);
 
-		// --- 4. JSPファイルに処理を転送 ---
-		// 転送先のJSPファイルパスを指定 (例: /WEB-INF/jsp/history.jsp)
+		// --- 5. JSPへフォワード ---
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/history.jsp");
 		dispatcher.forward(request, response);
 	}

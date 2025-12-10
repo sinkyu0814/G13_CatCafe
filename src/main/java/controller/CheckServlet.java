@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import model.dto.MenuDTO;
+import viewmodel.CartItem;
 
 /**
  * Servlet implementation class CheckServlet
@@ -34,21 +34,23 @@ public class CheckServlet extends HttpServlet {
 		//response.getWriter().append("Served at: ").append(request.getContextPath());
 		HttpSession session = request.getSession();
 
-		// --- 1. データ取得（セッションからカートを取得） ---
-		// カート情報（List<MenuDTO>）がセッションの "cart" 属性に保存されていると仮定
+		// --- 1. カート取得 ---
 		@SuppressWarnings("unchecked")
-		List<MenuDTO> orderedItems = (List<MenuDTO>) session.getAttribute("cart");
+		List<CartItem> orderedItems = (List<CartItem>) session.getAttribute("cart");
 
+		// --- 2. 合計金額計算 ---
+		int totalAmount = 0;
+		if (orderedItems != null) {
+			for (CartItem item : orderedItems) {
+				totalAmount += item.getTotalPrice();
+			}
+		}
 
-		// --- 2. データ処理（Serviceによる合計金額の計算） ---
-		int totalAmount = menuService.calculateTotal(orderedItems);
-
-		// --- 3. データをリクエストスコープに格納 ---
-		request.setAttribute("items", orderedItems); // JSPで使う変数名を 'items' に統一
+		// --- 3. リクエストへセット ---
+		request.setAttribute("items", orderedItems);
 		request.setAttribute("totalAmount", totalAmount);
 
-		// --- 4. JSPファイルに処理を転送 ---
-		// 転送先のJSPファイルパスを指定 (例: /WEB-INF/jsp/check.jsp)
+		// --- 4. JSPへフォワード ---
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/check.jsp");
 		dispatcher.forward(request, response);
 	}

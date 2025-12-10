@@ -49,6 +49,9 @@
 		<form action="ConfirmOrderServlet" method="post">
 			<button>注文確定</button>
 		</form>
+		<form action="HistoryServlet" method="get">
+			<button>注文履歴を見る</button>
+		</form>
 	</div>
 
 </body>
