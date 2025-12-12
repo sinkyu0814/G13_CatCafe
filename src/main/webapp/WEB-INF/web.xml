@@ -119,4 +119,14 @@
     <servlet-name>HistoryServlet</servlet-name>
     <url-pattern>/HistoryServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>TableSelectServlet</display-name>
+    <servlet-name>TableSelectServlet</servlet-name>
+    <servlet-class>controller.TableSelectServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>TableSelectServlet</servlet-name>
+    <url-pattern>/TableSelectServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

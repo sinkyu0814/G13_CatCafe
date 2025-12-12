@@ -26,6 +26,10 @@
 	<form action="AddMenuServlet" method="get">
 		<button type="submit">管理(Menu登録)画面へ</button>
 	</form>
-
+	<br>
+	
+	<form action="TableSelectServlet" method="get">
+		<button type="submit">レジ画面へ</button>
+	</form>
 </body>
 </html>

@@ -8,9 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>shinkyu13-check</title>
 <style>
-/* ★★ CSSは以前提案したcheck.jsp用のスタイルをここに適用します ★★
-    （例として、主要なレイアウトを保つための最小限のスタイルを含めます）
-*/
+/* (ご提示いただいたスタイルそのまま) */
 body {
 	font-family: sans-serif;
 	margin: 0;
@@ -92,9 +90,12 @@ body {
 <body>
 
 	<header class="page-header">
-		<h1>会計</h1>
+		<h1>会計確認 (Table: ${tableNumber})</h1>
 		<%-- HistoryServletへ戻る --%>
-		<a href="HistoryServlet"><button>戻る</button></a>
+		<form action="HistoryServlet" method="GET" style="margin: 0;">
+			<input type="hidden" name="tableNumber" value="${tableNumber}">
+			<button type="submit">戻る</button>
+		</form>
 	</header>
 
 	<div class="main-content">
@@ -103,26 +104,28 @@ body {
 			<table class="item-list-table">
 				<thead>
 					<tr>
-						<th style="width: 10%;">画像</th>
-						<th style="width: 50%;">商品名</th>
+						<th style="width: 15%;">画像</th>
+						<th style="width: 45%;">商品名</th>
 						<th style="width: 20%;">値段</th>
 						<th style="width: 20%;">注文数</th>
 					</tr>
 				</thead>
 				<tbody>
-					<%-- ★ 修正: Servletから渡されたリスト 'items' をJSTLでループ ★ --%>
 					<c:forEach var="item" items="${items}">
 						<tr>
-							<td>画像</td>
+							<td><c:if test="${not empty item.image}">
+									<img src="webapp/assets/images/${item.image}" width="60"
+										height="60" style="object-fit: cover;">
+								</c:if> <c:if test="${empty item.image}">No Image</c:if></td>
 							<td>${item.name}</td>
 							<td>${item.price}円</td>
 							<td>${item.quantity}個</td>
 						</tr>
 					</c:forEach>
-					<%-- カートが空の場合はメッセージを表示 --%>
+
 					<c:if test="${empty items}">
 						<tr>
-							<td colspan="4" style="text-align: center;">注文された商品はありません。</td>
+							<td colspan="4" style="text-align: center;">注文はありません。</td>
 						</tr>
 					</c:if>
 				</tbody>
@@ -131,13 +134,14 @@ body {
 
 		<div class="summary-container">
 			<div class="total-price-box">
-				<span class="total-price-label">合計金額</span>
-				<%-- ★ 修正: Servletから渡された合計金額を表示 ★ --%>
-				<span class="total-price-value">${totalAmount}円</span>
+				<span class="total-price-label">合計金額</span> <span
+					class="total-price-value">${totalAmount}円</span>
 			</div>
 
-			<%-- ★ 修正: CheckoutServlet（会計案内）へ遷移するフォーム ★ --%>
+			<%-- ★ここを checkout に戻しました --%>
 			<form action="checkout" method="GET" class="action-buttons">
+				<%-- DB連携のため、checkout先でもテーブル番号が必要になるはずなので送ります --%>
+				<input type="hidden" name="tableNumber" value="${tableNumber}">
 				<button type="submit" class="complete-button">確認完了</button>
 			</form>
 		</div>
