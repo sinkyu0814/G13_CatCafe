@@ -69,7 +69,7 @@ th, td {
 		<h2><%=tableNum%>テーブル
 		</h2>
 		<%-- 戻るボタンでHistoryServletへ戻るように修正（履歴画面へ戻る） --%>
-		<form action="HistoryServlet" method="GET">
+		<form action="TableSelectServlet" method="GET">
 			<input type="hidden" name="tableNumber" value="<%=tableNum%>">
 			<button type="submit">戻る</button>
 		</form>
