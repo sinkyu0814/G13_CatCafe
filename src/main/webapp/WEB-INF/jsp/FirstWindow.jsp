@@ -24,6 +24,11 @@ input[type=text] {
 	width: 120px;
 	text-align: right;
 }
+
+.error {
+	color: red;
+	margin-top: 20px;
+}
 </style>
 
 <script>
@@ -50,37 +55,33 @@ input[type=text] {
 		activeInput.value = activeInput.value.slice(0, -1);
 	}
 </script>
-
 </head>
-<body>
 
+<body>
 	<h1>ねこまるカフェ</h1>
 
 	<form action="ToppageServlet" method="post">
 
 		<p>
 			人数： <input type="text" name="persons" id="persons" readonly
-				onclick="setActive('persons')">
+				onclick="setActive('persons')" value="${param.persons}">
 		</p>
 
 		<p>
 			テーブル番号： <input type="text" name="tableNo" id="tableNo" readonly
-				onclick="setActive('tableNo')">
+				onclick="setActive('tableNo')" value="${param.tableNo}">
 		</p>
 
 		<div class="keypad">
 			<button type="button" onclick="press(1)">1</button>
 			<button type="button" onclick="press(2)">2</button>
 			<button type="button" onclick="press(3)">3</button>
-
 			<button type="button" onclick="press(4)">4</button>
 			<button type="button" onclick="press(5)">5</button>
 			<button type="button" onclick="press(6)">6</button>
-
 			<button type="button" onclick="press(7)">7</button>
 			<button type="button" onclick="press(8)">8</button>
 			<button type="button" onclick="press(9)">9</button>
-
 			<button type="button" onclick="clearInput()">C</button>
 			<button type="button" onclick="press(0)">0</button>
 			<button type="button" onclick="backspace()">←</button>
@@ -90,6 +91,11 @@ input[type=text] {
 		<button type="submit">注文開始</button>
 
 	</form>
+
+	<!-- エラーメッセージ表示 -->
+	<c:if test="${not empty error}">
+		<div class="error">${error}</div>
+	</c:if>
 
 </body>
 </html>
