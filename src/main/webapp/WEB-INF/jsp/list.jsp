@@ -23,7 +23,6 @@
 
 	<!-- 左：商品一覧 -->
 	<div>
-		${menuList.size() }
 		<c:forEach var="m" items="${menuList}">
 			<div class="menu-item">
 				<a href="ConfirmServlet?id=${m.id}"> <img
