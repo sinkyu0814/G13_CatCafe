@@ -35,55 +35,47 @@ public class ToppageServlet extends HttpServlet {
 		int persons;
 		int tableNo;
 
-		// -------------------------
-		// ① 未入力チェック
-		// -------------------------
+		// 未入力チェック
 		if (personsStr == null || personsStr.isEmpty()
 				|| tableNoStr == null || tableNoStr.isEmpty()) {
 
-			request.setAttribute("error", "1～25番を入力してください");
+			request.setAttribute("error", "人数とテーブル番号を入力してください");
 			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp")
 					.forward(request, response);
 			return;
 		}
 
-		// -------------------------
-		// ② 数値チェック
-		// -------------------------
+		// 数値チェック
 		try {
 			persons = Integer.parseInt(personsStr);
 			tableNo = Integer.parseInt(tableNoStr);
 		} catch (NumberFormatException e) {
-			request.setAttribute("error", "1～25番を入力してください");
+			request.setAttribute("error", "正しい数値を入力してください");
 			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp")
 					.forward(request, response);
 			return;
 		}
 
-		// -------------------------
-		// ③ 範囲チェック
-		// -------------------------
-		if (tableNo < 1 || tableNo > 25 || persons <= 0) {
-			request.setAttribute("error", "1～25番を入力してください");
-			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp")
-					.forward(request, response);
-			return;
-		}
-		if (persons < 1 || persons > 10 || persons <= 0) {
-			request.setAttribute("error", "1～10人を入力してください");
+		// 範囲チェック
+		if (tableNo < 1 || tableNo > 25) {
+			request.setAttribute("error", "テーブル番号は1～25番です");
 			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp")
 					.forward(request, response);
 			return;
 		}
 
-		// -------------------------
-		// ④ 正常処理
-		// -------------------------
+		if (persons < 1 || persons > 10) {
+			request.setAttribute("error", "人数は1～10人です");
+			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp")
+					.forward(request, response);
+			return;
+		}
+
 		HttpSession session = request.getSession();
 		session.setAttribute("persons", persons);
 		session.setAttribute("tableNo", tableNo);
 
-		// --- DBに注文（orders）を作成 ---
+		// orders 作成
 		try (Connection conn = DBManager.getConnection()) {
 
 			String sql = """
@@ -100,20 +92,16 @@ public class ToppageServlet extends HttpServlet {
 				ps.setInt(2, persons);
 				ps.executeUpdate();
 
-				// 採番された order_id を取得
 				try (ResultSet rs = ps.getGeneratedKeys()) {
 					if (rs.next()) {
-						int orderId = rs.getInt(1);
-						session.setAttribute("orderId", orderId);
+						session.setAttribute("orderId", rs.getInt(1));
 					}
 				}
 			}
-
 		} catch (Exception e) {
 			throw new ServletException(e);
 		}
 
-		// メニュー一覧へ
 		response.sendRedirect("ListServlet");
 	}
 }
