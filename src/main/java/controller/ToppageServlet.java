@@ -69,6 +69,12 @@ public class ToppageServlet extends HttpServlet {
 					.forward(request, response);
 			return;
 		}
+		if (persons < 1 || persons > 10 || persons <= 0) {
+			request.setAttribute("error", "1～10人を入力してください");
+			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp")
+					.forward(request, response);
+			return;
+		}
 
 		// -------------------------
 		// ④ 正常処理
