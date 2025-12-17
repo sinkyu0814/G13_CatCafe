@@ -120,4 +120,50 @@ public class CartDAO {
 			}
 		}
 	}
+
+	/**
+	 * 既存の orderId に対して order_items を登録する
+	 */
+	public void insertOrderItems(int orderId, List<CartItem> cart) throws Exception {
+
+		Connection conn = null;
+		PreparedStatement ps = null;
+
+		try {
+			conn = DBManager.getConnection();
+			conn.setAutoCommit(false);
+
+			String sql = "INSERT INTO order_items "
+					+ "(order_item_id, order_id, menu_id, goods_name, price, quantity) "
+					+ "VALUES (seq_order_items.nextval, ?, ?, ?, ?, ?)";
+
+			ps = conn.prepareStatement(sql);
+
+			for (CartItem ci : cart) {
+				ps.setInt(1, orderId);
+				ps.setString(2, String.valueOf(ci.getGoodsId()));
+				ps.setString(3, ci.getGoodsName());
+				ps.setInt(4, ci.getPrice());
+				ps.setInt(5, ci.getQuantity());
+				ps.addBatch();
+			}
+
+			ps.executeBatch();
+			conn.commit();
+
+		} catch (Exception e) {
+			if (conn != null)
+				conn.rollback();
+			throw e;
+
+		} finally {
+			if (ps != null)
+				ps.close();
+			if (conn != null) {
+				conn.setAutoCommit(true);
+				conn.close();
+			}
+		}
+
+	}
 }

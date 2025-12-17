@@ -1,71 +1,80 @@
 package controller;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
+import database.DBManager;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet("/checkout")
-/**
- * Servlet implementation class CheckoutServlet
- */
 public class CheckoutServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
-	public CheckoutServlet() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+	// =========================
+	// 会計完了画面表示
+	// =========================
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		//response.getWriter().append("Served at: ").append(request.getContextPath());
-		// セッションを取得 (存在しない場合は null が返る)
+
 		HttpSession session = request.getSession(false);
 
-		String tableNo = null;
+		Integer orderId = null;
+		Integer tableNo = null;
 
-		// 1. セッションが存在する場合に処理を行う
+		// --- 1. orderId を取得 ---
 		if (session != null) {
-
-			// テーブル番号を取得
-			Object tableNoObj = session.getAttribute("tableNo");
-			if (tableNoObj != null) {
-				tableNo = tableNoObj.toString();
-			}
-
-			// ★ 2. 注文プロセスが完了したため、カート情報をセッションから削除する ★
-			//     次の注文時に前の注文が残らないようにするため
-			session.removeAttribute("cart");
+			orderId = (Integer) session.getAttribute("orderId");
 		}
 
-		// 3. 取得したテーブル番号をリクエストスコープに保存する
+		if (orderId == null) {
+			request.setAttribute("error", "会計情報が取得できません");
+			request.getRequestDispatcher("/WEB-INF/jsp/checkout.jsp")
+					.forward(request, response);
+			return;
+		}
+
+		// --- 2. orderId からテーブル番号を取得 ---
+		try (Connection conn = DBManager.getConnection()) {
+
+			String sql = """
+					SELECT table_no
+					FROM orders
+					WHERE order_id = ?
+					""";
+
+			try (PreparedStatement ps = conn.prepareStatement(sql)) {
+				ps.setInt(1, orderId);
+
+				try (ResultSet rs = ps.executeQuery()) {
+					if (rs.next()) {
+						tableNo = rs.getInt("table_no");
+					}
+				}
+			}
+
+		} catch (Exception e) {
+			throw new ServletException(e);
+		}
+
+		// --- 3. 表示用データをリクエストへ ---
+		request.setAttribute("orderId", orderId);
 		request.setAttribute("tableNo", tableNo);
 
-		// 4. 画面表示を行うJSPへフォワードする
+		// --- 4. JSPへ ---
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/checkout.jsp");
 		dispatcher.forward(request, response);
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
-
 }

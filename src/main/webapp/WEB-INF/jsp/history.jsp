@@ -7,8 +7,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>注文履歴</title>
+
 <style type="text/css">
-/* (スタイルは省略します。元のままでOKです) */
+/* 元のスタイルそのまま */
 body {
 	font-family: sans-serif;
 	margin: 0;
@@ -102,14 +103,17 @@ body {
 }
 </style>
 </head>
+
 <body>
 
 	<header class="page-header">
-		<h1>注文履歴 (Table: ${tableNumber})</h1>
+		<h1>注文履歴（テーブル ${tableNo} ／ 注文ID ${orderId}）</h1>
 		<button onclick="location.href='TableSelectServlet'">閉じる</button>
 	</header>
 
 	<div class="main-content">
+
+		<!-- ===== 注文一覧 ===== -->
 		<div class="scrollable-area">
 			<table class="item-list-table">
 				<thead>
@@ -120,25 +124,40 @@ body {
 						<th style="width: 20%;">注文数</th>
 					</tr>
 				</thead>
+
 				<tbody>
 					<c:forEach var="item" items="${orderItems}">
 						<tr>
-							<td><c:if test="${not empty item.image}">
-									<img src="webapp/assets/images/${item.image}" width="50"
-										height="50" style="object-fit: cover;">
-								</c:if> <c:if test="${empty item.image}">No Image</c:if></td>
+							<td><c:choose>
+									<c:when test="${not empty item.image}">
+										<img
+											src="${pageContext.request.contextPath}/assets/images/${item.image}"
+											width="50" height="50" style="object-fit: cover;">
+									</c:when>
+									<c:otherwise>
+										No Image
+									</c:otherwise>
+								</c:choose></td>
 							<td>${item.name}</td>
 							<td>${item.price}円</td>
 							<td>${item.quantity}個</td>
 						</tr>
 					</c:forEach>
+
+					<c:if test="${empty orderItems}">
+						<tr>
+							<td colspan="4">注文履歴がありません</td>
+						</tr>
+					</c:if>
 				</tbody>
 			</table>
 		</div>
 
+		<!-- ===== サマリー ===== -->
 		<div class="summary-container">
+
 			<div class="nutrition-summary-box">
-				<span class="summary-label">栄養素合計</span>
+				<span class="summary-label">栄養素合計（仮）</span>
 				<p>カロリー: ${nutritionData.calories}</p>
 				<p>タンパク質: ${nutritionData.protein}</p>
 			</div>
@@ -151,15 +170,14 @@ body {
 			<div class="action-buttons">
 				<button class="call-button">店員呼び出し</button>
 
-				<%-- ★ここを CheckServlet に戻しました --%>
+				<!-- 会計画面へ（orderIdをセッション利用する想定） -->
 				<form action="CheckServlet" method="GET"
 					style="margin: 0; padding: 0; width: 100%;">
-					<%-- 次の画面でDB検索するためにテーブル番号を渡します --%>
-					<input type="hidden" name="tableNumber" value="${tableNumber}">
 					<button type="submit" class="checkout-button">会計</button>
 				</form>
 			</div>
 		</div>
 	</div>
+
 </body>
 </html>

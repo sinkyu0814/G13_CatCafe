@@ -1,8 +1,10 @@
 <%@ page import="java.util.List, viewmodel.OrderItem"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<!DOCTYPE html>
 <html>
 <head>
 <title>個別会計画面</title>
+
 <style>
 body {
 	font-family: Arial, sans-serif;
@@ -19,7 +21,7 @@ body {
 	margin-top: 20px;
 }
 
-.order-panel {
+.order-panel, .accounting-panel {
 	border: 1px solid #ccc;
 	padding: 15px;
 }
@@ -53,10 +55,12 @@ th, td {
 }
 </style>
 </head>
+
 <body>
+
 	<%
-	// Servletからデータを受け取る
-	String tableNum = (String) request.getAttribute("selectedTable");
+	Integer orderId = (Integer) request.getAttribute("orderId");
+	Integer tableNo = (Integer) request.getAttribute("tableNo");
 	List<OrderItem> orderList = (List<OrderItem>) request.getAttribute("orderList");
 	Integer totalAmount = (Integer) request.getAttribute("totalAmount");
 	if (totalAmount == null)
@@ -64,18 +68,25 @@ th, td {
 	%>
 
 	<h1>個別会計画面</h1>
+
 	<div
 		style="width: 800px; display: flex; justify-content: space-between;">
-		<h2><%=tableNum%>テーブル
+		<h2>
+			テーブル
+			<%=tableNo%>（注文ID:
+			<%=orderId%>）
 		</h2>
-		<%-- 戻るボタンでHistoryServletへ戻るように修正（履歴画面へ戻る） --%>
-		<form action="TableSelectServlet" method="GET">
-			<input type="hidden" name="tableNumber" value="<%=tableNum%>">
+
+		<!-- 注文履歴へ戻る -->
+		<form action="HistoryServlet" method="GET">
+			<input type="hidden" name="orderId" value="<%=orderId%>">
 			<button type="submit">戻る</button>
 		</form>
 	</div>
 
 	<div class="grid-container">
+
+		<!-- 注文内容 -->
 		<div class="order-panel">
 			<h3>
 				合計金額: <span id="totalAmountDisplay"><%=totalAmount%></span> 円
@@ -85,31 +96,38 @@ th, td {
 			<table>
 				<thead>
 					<tr>
-						<th>お品物</th>
+						<th>商品名</th>
 						<th>数量</th>
 						<th>単価</th>
 					</tr>
 				</thead>
 				<tbody>
 					<%
-					if (orderList != null) {
+					if (orderList != null && !orderList.isEmpty()) {
 						for (OrderItem item : orderList) {
 					%>
 					<tr>
 						<td><%=item.getName()%></td>
-						<%-- getGoodsName() -> getName() --%>
 						<td><%=item.getQuantity()%></td>
 						<td><%=item.getPrice()%> 円</td>
 					</tr>
 					<%
 					}
+					} else {
+					%>
+					<tr>
+						<td colspan="3">注文がありません</td>
+					</tr>
+					<%
 					}
 					%>
 				</tbody>
 			</table>
 		</div>
 
+		<!-- 会計操作 -->
 		<div class="accounting-panel">
+
 			<div class="amount-info">
 				<div>
 					預り金: <input type="text" id="depositInput" readonly value="0">
@@ -124,82 +142,80 @@ th, td {
 				<%
 				for (int i = 1; i <= 9; i++) {
 				%>
-				<button onclick="inputNumber(<%=i%>)"><%=i%></button>
+				<button type="button" onclick="inputNumber(<%=i%>)"><%=i%></button>
 				<%
 				}
 				%>
-				<button onclick="inputNumber(0)">0</button>
-				<button onclick="clearInput()">×</button>
+				<button type="button" onclick="inputNumber(0)">0</button>
+				<button type="button" onclick="clearInput()">×</button>
 			</div>
 
+			<!-- 会計確定 -->
 			<form id="finishAccountingForm" action="AccountingServlet"
 				method="POST">
-				<input type="hidden" name="action" value="finishAccounting">
-				<input type="hidden" name="tableNumber" value="<%=tableNum%>">
-				<input type="hidden" name="totalAmount" value="<%=totalAmount%>">
+				<input type="hidden" name="orderId" value="<%=orderId%>"> <input
+					type="hidden" name="totalAmount" value="<%=totalAmount%>">
 				<input type="hidden" name="deposit" id="hiddenDeposit" value="0">
 
 				<button type="button" id="finishButton"
 					onclick="submitFinishAccounting()"
 					style="width: 100%; margin-top: 10px;">会計終了</button>
 			</form>
+
 		</div>
 	</div>
 
 	<script>
-    const depositInput = document.getElementById('depositInput');
-    const changeDisplay = document.getElementById('changeDisplay');
-    const totalAmountValue = parseInt(document.getElementById('totalAmountValue').value);
-    const finishButton = document.getElementById('finishButton');
+const depositInput = document.getElementById('depositInput');
+const changeDisplay = document.getElementById('changeDisplay');
+const totalAmountValue = parseInt(document.getElementById('totalAmountValue').value);
+const finishButton = document.getElementById('finishButton');
 
-    function calculateChange() {
-        const deposit = parseInt(depositInput.value) || 0;
-        const total = totalAmountValue;
-        let change = deposit - total;
+function calculateChange() {
+	const deposit = parseInt(depositInput.value) || 0;
+	const change = deposit - totalAmountValue;
 
-        changeDisplay.textContent = change >= 0 ? change.toLocaleString() : '金額不足';
-        
-        // 金額が不足しているか、合計金額が0の場合はボタンを押せないようにする
-        if (change < 0 || total === 0) {
-            finishButton.disabled = true;
-        } else {
-            finishButton.disabled = false;
-        }
-    }
-    
-    function inputNumber(num) {
-        let currentValue = depositInput.value === '0' ? '' : depositInput.value;
-        if (currentValue.length < 9) { 
-            depositInput.value = currentValue + num;
-        }
-        calculateChange();
-    }
+	if (change >= 0) {
+		changeDisplay.textContent = change.toLocaleString();
+		finishButton.disabled = (totalAmountValue === 0);
+	} else {
+		changeDisplay.textContent = '金額不足';
+		finishButton.disabled = true;
+	}
+}
 
-    function clearInput() {
-        let currentValue = depositInput.value;
-        if (currentValue.length > 1) {
-            depositInput.value = currentValue.slice(0, -1);
-        } else {
-            depositInput.value = '0';
-        }
-        calculateChange();
-    }
-    
-    function submitFinishAccounting() {
-        const deposit = parseInt(depositInput.value) || 0;
-        const total = totalAmountValue;
-        
-        if (deposit >= total && total > 0) {
-            document.getElementById('hiddenDeposit').value = deposit;
-            document.getElementById('finishAccountingForm').submit();
-        } else if (total === 0) {
-             alert('会計する商品がありません。');
-        } else {
-            alert('預り金が不足しています。');
-        }
-    }
+function inputNumber(num) {
+	let current = depositInput.value === '0' ? '' : depositInput.value;
+	if (current.length < 9) {
+		depositInput.value = current + num;
+	}
+	calculateChange();
+}
 
-    calculateChange(); // 初期化
+function clearInput() {
+	let current = depositInput.value;
+	if (current.length > 1) {
+		depositInput.value = current.slice(0, -1);
+	} else {
+		depositInput.value = '0';
+	}
+	calculateChange();
+}
+
+function submitFinishAccounting() {
+	const deposit = parseInt(depositInput.value) || 0;
+	if (deposit >= totalAmountValue && totalAmountValue > 0) {
+		document.getElementById('hiddenDeposit').value = deposit;
+		document.getElementById('finishAccountingForm').submit();
+	} else if (totalAmountValue === 0) {
+		alert('会計する商品がありません。');
+	} else {
+		alert('預り金が不足しています。');
+	}
+}
+
+calculateChange();
 </script>
+
 </body>
 </html>

@@ -8,7 +8,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>shinkyu13-check</title>
 <style>
-/* (ご提示いただいたスタイルそのまま) */
 body {
 	font-family: sans-serif;
 	margin: 0;
@@ -90,10 +89,11 @@ body {
 <body>
 
 	<header class="page-header">
-		<h1>会計確認 (Table: ${tableNumber})</h1>
-		<%-- HistoryServletへ戻る --%>
+		<h1>会計確認（テーブル ${tableNo}）</h1>
+
+		<%-- HistoryServlet（orderId基準）へ戻る --%>
 		<form action="HistoryServlet" method="GET" style="margin: 0;">
-			<input type="hidden" name="tableNumber" value="${tableNumber}">
+			<input type="hidden" name="orderId" value="${orderId}">
 			<button type="submit">戻る</button>
 		</form>
 	</header>
@@ -114,9 +114,11 @@ body {
 					<c:forEach var="item" items="${items}">
 						<tr>
 							<td><c:if test="${not empty item.image}">
-									<img src="webapp/assets/images/${item.image}" width="60"
-										height="60" style="object-fit: cover;">
-								</c:if> <c:if test="${empty item.image}">No Image</c:if></td>
+									<img src="assets/images/${item.image}" width="60" height="60"
+										style="object-fit: cover;">
+								</c:if> <c:if test="${empty item.image}">
+									No Image
+								</c:if></td>
 							<td>${item.name}</td>
 							<td>${item.price}円</td>
 							<td>${item.quantity}個</td>
@@ -138,11 +140,9 @@ body {
 					class="total-price-value">${totalAmount}円</span>
 			</div>
 
-			<%-- ★ここを checkout に戻しました --%>
-			<form action="checkout" method="GET" class="action-buttons">
-				<%-- DB連携のため、checkout先でもテーブル番号が必要になるはずなので送ります --%>
-				<input type="hidden" name="tableNumber" value="${tableNumber}">
-				<button type="submit" class="complete-button">確認完了</button>
+			<form action="CheckoutServlet" method="POST" class="action-buttons">
+				<input type="hidden" name="orderId" value="${orderId}">
+				<button type="submit" class="complete-button">会計確定</button>
 			</form>
 		</div>
 

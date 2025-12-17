@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>shinkyu13-checkout</title>
+<title>checkout</title>
 <style>
 body {
 	font-family: sans-serif;

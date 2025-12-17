@@ -19,8 +19,11 @@ public class ConfirmOrderServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		HttpSession session = request.getSession();
-		List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
 
+		// -------------------------
+		// カート取得
+		// -------------------------
+		List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
 		if (cart == null || cart.isEmpty()) {
 			request.setAttribute("error", "カートが空です");
 			request.getRequestDispatcher("/WEB-INF/jsp/list.jsp")
@@ -28,26 +31,29 @@ public class ConfirmOrderServlet extends HttpServlet {
 			return;
 		}
 
-		// 🔑 最初に入力したテーブル番号（ToppageServlet で保存済み）
-		Integer tableNo = (Integer) session.getAttribute("tableNo");
-		if (tableNo == null) {
-			throw new ServletException("テーブル番号がセッションに存在しません");
+		// -------------------------
+		// orderId 取得（注文開始時に作成済み）
+		// -------------------------
+		Integer orderId = (Integer) session.getAttribute("orderId");
+		if (orderId == null) {
+			throw new ServletException("orderId がセッションに存在しません");
 		}
 
+		// -------------------------
+		// 明細を DB に登録
+		// -------------------------
 		CartDAO dao = new CartDAO();
-		long orderId;
-
 		try {
-			// ⭐ CartDAOの完成メソッドを使う
-			orderId = dao.insertOrder(cart, String.valueOf(tableNo));
+			dao.insertOrderItems(orderId, cart);
 		} catch (Exception e) {
 			throw new ServletException(e);
 		}
 
-		// カートをクリア
+		// -------------------------
+		// 後処理
+		// -------------------------
 		session.removeAttribute("cart");
 
-		// 完了画面用
 		request.setAttribute("orderId", orderId);
 		request.setAttribute("orderItems", cart);
 
