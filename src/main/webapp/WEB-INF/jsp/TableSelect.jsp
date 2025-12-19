@@ -1,5 +1,7 @@
 <%-- webapp/WEB-INF/jsp/TableSelect.jsp --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ page import="java.util.Map"%>
+
 <html>
 <head>
 <title>席選択画面</title>
@@ -26,12 +28,19 @@
 	background-color: #c0e0f0;
 }
 
+.status {
+	margin-top: 5px;
+	font-size: 0.9em;
+	color: #333;
+}
+
 button {
 	padding: 10px 20px;
 	margin: 5px;
 }
 </style>
 </head>
+
 <body>
 	<div style="width: 800px; margin: auto;">
 		<h1>席選択</h1>
@@ -41,15 +50,30 @@ button {
 		<input type="hidden" id="selectedTable" name="tableNumber" value="">
 		<input type="hidden" name="action" value="startAccounting">
 
+		<%
+			Map<Integer, Integer> tablePersonsMap =
+				(Map<Integer, Integer>) request.getAttribute("tablePersonsMap");
+		%>
+
 		<div class="table-layout">
-			<%-- テーブルを25卓分作成 --%>
 			<%
 			for (int i = 1; i <= 25; i++) {
+
+				String statusText = "空席";
+
+				if (tablePersonsMap != null && tablePersonsMap.containsKey(i)) {
+					int p = tablePersonsMap.get(i);
+					if (p > 0) {
+						statusText = p + "名";
+					} else {
+						statusText = "？名";
+					}
+				}
 			%>
 			<div class="table-unit" id="table-<%=i%>"
 				onclick="selectTable('<%=i%>番')">
 				<%=i%>番
-				<div class="status">○名</div>
+				<div class="status"><%=statusText%></div>
 			</div>
 			<%
 			}
@@ -65,19 +89,17 @@ button {
 		let currentSelectedTable = null;
 
 		function selectTable(tableNum) {
-			// 既存の選択を解除
 			if (currentSelectedTable) {
 				document.getElementById(currentSelectedTable).classList
 						.remove('selected');
 			}
 
-			// 新しい選択を設定
-			const tableElement = document.getElementById('table-'
-					+ tableNum.replace('番', ''));
-			tableElement.classList.add('selected');
-			currentSelectedTable = 'table-' + tableNum.replace('番', '');
+			const tableId = 'table-' + tableNum.replace('番', '');
+			const tableElement = document.getElementById(tableId);
 
-			// 隠しフィールドにテーブル番号をセット
+			tableElement.classList.add('selected');
+			currentSelectedTable = tableId;
+
 			document.getElementById('selectedTable').value = tableNum;
 		}
 

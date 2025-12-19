@@ -129,4 +129,24 @@
     <servlet-name>TableSelectServlet</servlet-name>
     <url-pattern>/TableSelectServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>DeleteMenuServlet</display-name>
+    <servlet-name>DeleteMenuServlet</servlet-name>
+    <servlet-class>controller.DeleteMenuServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DeleteMenuServlet</servlet-name>
+    <url-pattern>/DeleteMenuServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>ToggleMenuServlet</display-name>
+    <servlet-name>ToggleMenuServlet</servlet-name>
+    <servlet-class>controller.ToggleMenuServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ToggleMenuServlet</servlet-name>
+    <url-pattern>/ToggleMenuServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

@@ -1,8 +1,14 @@
 package controller;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import database.DBManager;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -12,41 +18,66 @@ import jakarta.servlet.http.HttpSession;
 import model.dto.MenuDTO;
 import model.service.MenuService;
 
-//@WebServlet("/TableSelectServlet")
 public class TableSelectServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
 	public TableSelectServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+	// =========================
+	// 席選択画面表示
+	// =========================
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		//response.getWriter().append("Served at: ").append(request.getContextPath());
+
 		HttpSession session = request.getSession();
 		Integer persons = (Integer) session.getAttribute("persons");
 		request.setAttribute("persons", persons);
 
-		// category パラメータ取得
+		// -------------------------
+		// テーブル番号 × 人数取得
+		// -------------------------
+		Map<Integer, Integer> tablePersonsMap = new HashMap<>();
+
+		try (Connection conn = DBManager.getConnection()) {
+
+			String sql = """
+						SELECT table_no, persons
+						FROM orders
+						WHERE status = 'NEW'
+					""";
+
+			try (PreparedStatement ps = conn.prepareStatement(sql);
+					ResultSet rs = ps.executeQuery()) {
+
+				while (rs.next()) {
+					int tableNo = rs.getInt("table_no");
+					int p = rs.getInt("persons"); // NULL → 0
+					tablePersonsMap.put(tableNo, p);
+				}
+			}
+
+		} catch (Exception e) {
+			throw new ServletException(e);
+		}
+
+		request.setAttribute("tablePersonsMap", tablePersonsMap);
+
+		// -------------------------
+		// メニュー表示処理（既存）
+		// -------------------------
 		String category = request.getParameter("category");
-		if (category == null)
+		if (category == null) {
 			category = "all";
+		}
 
 		MenuService service = new MenuService();
 
-		// カテゴリ一覧
 		List<String> catList = service.getCategoryList();
 		request.setAttribute("categoryList", catList);
 
-		// メニュー一覧
 		List<MenuDTO> menuList = service.getMenuList(category);
 		request.setAttribute("menuList", menuList);
 
@@ -54,13 +85,9 @@ public class TableSelectServlet extends HttpServlet {
 		rd.forward(request, response);
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
-
 }

@@ -78,7 +78,7 @@ th, td {
 		</h2>
 
 		<!-- 注文履歴へ戻る -->
-		<form action="HistoryServlet" method="GET">
+		<form action="TableSelectServlet" method="GET">
 			<input type="hidden" name="orderId" value="<%=orderId%>">
 			<button type="submit">戻る</button>
 		</form>

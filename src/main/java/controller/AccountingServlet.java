@@ -89,54 +89,89 @@ public class AccountingServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		String action = request.getParameter("action");
+
+		// =========================
+		// 会計開始（TableSelect → Accounting）
+		// =========================
+		if ("startAccounting".equals(action)) {
+
+			String tableStr = request.getParameter("tableNumber");
+			if (tableStr == null) {
+				throw new ServletException("テーブル番号が送信されていません");
+			}
+
+			int tableNo = Integer.parseInt(tableStr.replace("番", ""));
+
+			HttpSession session = request.getSession();
+
+			// tableNo から NEW の orderId を取得
+			try (Connection conn = DBManager.getConnection()) {
+
+				String sql = """
+						    SELECT order_id
+						    FROM orders
+						    WHERE table_no = ? AND status = 'NEW'
+						""";
+
+				try (PreparedStatement ps = conn.prepareStatement(sql)) {
+					ps.setInt(1, tableNo);
+
+					try (ResultSet rs = ps.executeQuery()) {
+						if (rs.next()) {
+							session.setAttribute("orderId", rs.getInt("order_id"));
+							session.setAttribute("tableNo", tableNo);
+						} else {
+							throw new ServletException("未会計の注文がありません");
+						}
+					}
+				}
+			} catch (Exception e) {
+				throw new ServletException(e);
+			}
+
+			// ★ 会計画面表示へ（GET）
+			response.sendRedirect("AccountingServlet");
+			return;
+		}
+
+		// =========================
+		// 会計確定（Accounting.jsp → Complete）
+		// =========================
+
 		HttpSession session = request.getSession();
 		Integer orderId = (Integer) session.getAttribute("orderId");
 		Integer tableNo = (Integer) session.getAttribute("tableNo");
 
 		if (orderId == null) {
-			request.setAttribute("error", "会計対象の注文が見つかりません");
-			request.getRequestDispatcher("/WEB-INF/jsp/Accounting.jsp")
-					.forward(request, response);
-			return;
+			throw new ServletException("会計対象の注文が見つかりません");
 		}
 
-		// ★ null安全に取得
-		String totalStr = request.getParameter("totalAmount");
-		String depositStr = request.getParameter("deposit");
-
-		if (totalStr == null || depositStr == null) {
-			throw new ServletException("会計情報が送信されていません");
-		}
-
-		int totalAmount = Integer.parseInt(totalStr);
-		int deposit = Integer.parseInt(depositStr);
+		int totalAmount = Integer.parseInt(request.getParameter("totalAmount"));
+		int deposit = Integer.parseInt(request.getParameter("deposit"));
 		int change = deposit - totalAmount;
 
-		// ---- 会計確定 ----
 		try (Connection conn = DBManager.getConnection()) {
 
 			String sql = """
-					UPDATE orders
-					SET status = 'PAID'
-					WHERE order_id = ? AND status = 'NEW'
+					    UPDATE orders
+					    SET status = 'PAID'
+					    WHERE order_id = ?
 					""";
 
 			try (PreparedStatement ps = conn.prepareStatement(sql)) {
 				ps.setInt(1, orderId);
 				ps.executeUpdate();
 			}
-
 		} catch (Exception e) {
 			throw new ServletException(e);
 		}
 
-		// ---- 完了画面へ ----
 		request.setAttribute("tableNo", tableNo);
 		request.setAttribute("totalAmount", totalAmount);
 		request.setAttribute("deposit", deposit);
 		request.setAttribute("change", change);
 
-		// セッション掃除
 		session.removeAttribute("orderId");
 		session.removeAttribute("tableNo");
 		session.removeAttribute("persons");
