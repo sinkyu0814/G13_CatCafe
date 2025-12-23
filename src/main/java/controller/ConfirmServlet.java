@@ -1,42 +1,41 @@
 package controller;
 
 import java.io.IOException;
+import java.util.List;
 
-import jakarta.servlet.RequestDispatcher;
+import database.MenuOptionDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.dto.MenuDTO;
+import model.dto.MenuOptionDTO;
 import model.service.MenuService;
+
 //@WebServlet("/ConfirmServlet")
 public class ConfirmServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-        request.setCharacterEncoding("UTF-8");
+		int id = Integer.parseInt(request.getParameter("id"));
 
-        String idStr = request.getParameter("id");
-        if (idStr == null) {
-            response.sendRedirect("ListServlet");
-            return;
-        }
+		MenuService service = new MenuService();
+		MenuDTO menu = service.getMenuById(id);
 
-        int id = Integer.parseInt(idStr);
+		MenuOptionDAO optionDao = new MenuOptionDAO();
+		List<MenuOptionDTO> options;
+		try {
+			options = optionDao.findByMenuId(id);
+		} catch (Exception e) {
+			throw new ServletException(e);
+		}
 
-        model.service.MenuService service = new MenuService();
-        MenuDTO menu = service.getMenuById(id);
+		request.setAttribute("menu", menu);
+		request.setAttribute("options", options);
 
-        if (menu == null) {
-            response.sendRedirect("ListServlet");
-            return;
-        }
-
-        request.setAttribute("menu", menu);
-
-        RequestDispatcher rd = request.getRequestDispatcher("WEB-INF/jsp/Confirm.jsp");
-        rd.forward(request, response);
-    }
+		request.getRequestDispatcher("/WEB-INF/jsp/Confirm.jsp")
+				.forward(request, response);
+	}
 }

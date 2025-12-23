@@ -38,6 +38,7 @@
 			<th>画像</th>
 			<th>表示</th>
 			<th>削除</th>
+			<th>オプション</th>
 		</tr>
 
 		<c:forEach var="menu" items="${menuList}">
@@ -47,9 +48,11 @@
 				<td>${menu.price}</td>
 				<td>${menu.quantity}</td>
 				<td>${menu.category}</td>
+
 				<td><c:if test="${not empty menu.img}">
 						<img src="assets/images/${menu.img}" width="50">
 					</c:if></td>
+
 				<td>
 					<form action="ToggleMenuServlet" method="post">
 						<input type="hidden" name="menuId" value="${menu.id}"> <input
@@ -59,12 +62,33 @@
 						</button>
 					</form>
 				</td>
+
 				<td>
 					<form action="DeleteMenuServlet" method="post"
 						onsubmit="return confirm('削除しますか？');">
 						<input type="hidden" name="menuId" value="${menu.id}">
 						<button type="submit">削除</button>
 					</form>
+				</td>
+
+				<!-- ★ オプション管理 -->
+				<td>
+					<form action="AddMenuOptionServlet" method="post">
+						<input type="hidden" name="menuId" value="${menu.id}"> <input
+							type="text" name="optionName" placeholder="例：大盛り" required>
+						<input type="number" name="optionPrice" placeholder="+100"
+							required>
+						<button type="submit">追加</button>
+					</form> <c:forEach var="opt" items="${menu.options}">
+						<div>
+							${opt.optionName}(+${opt.optionPrice}円)
+							<form action="DeleteMenuOptionServlet" method="post"
+								style="display: inline">
+								<input type="hidden" name="optionId" value="${opt.optionId}">
+								<button type="submit">×</button>
+							</form>
+						</div>
+					</c:forEach>
 				</td>
 			</tr>
 		</c:forEach>

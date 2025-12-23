@@ -24,20 +24,38 @@
 			<p>価格：${menu.price}円</p>
 			<p>カテゴリ：${menu.category}</p>
 
-			<!-- 数量選択 -->
 			<form action="CartAddServlet" method="post">
-				<input type="hidden" name="id" value="${menu.id}"> <label>数量：</label>
-				<select name="quantity">
+
+				<input type="hidden" name="id" value="${menu.id}">
+
+				<!-- 数量選択 -->
+				<label>数量：</label> <select name="quantity">
 					<c:forEach var="i" begin="1" end="10">
 						<option value="${i}">${i}</option>
 					</c:forEach>
 				</select> <br>
 				<br>
 
+				<!-- ★ オプション選択 -->
+				<c:if test="${not empty menu.options}">
+					<h4>オプション</h4>
+
+					<c:forEach var="opt" items="${menu.options}">
+						<label> <input type="checkbox" name="optionIds"
+							value="${opt.optionId}">
+							${opt.optionName}（+${opt.optionPrice}円）
+						</label>
+						<br>
+					</c:forEach>
+
+					<br>
+				</c:if>
+
 				<button type="submit">カートに追加</button>
 			</form>
 
 			<br>
+
 			<form action="ListServlet" method="get">
 				<button type="submit">閉じる</button>
 			</form>

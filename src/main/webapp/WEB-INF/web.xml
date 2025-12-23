@@ -149,4 +149,24 @@
     <servlet-name>ToggleMenuServlet</servlet-name>
     <url-pattern>/ToggleMenuServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>AddMenuOptionServlet</display-name>
+    <servlet-name>AddMenuOptionServlet</servlet-name>
+    <servlet-class>controller.AddMenuOptionServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AddMenuOptionServlet</servlet-name>
+    <url-pattern>/AddMenuOptionServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>MenuOptionDAO</display-name>
+    <servlet-name>MenuOptionDAO</servlet-name>
+    <servlet-class>database.MenuOptionDAO</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MenuOptionDAO</servlet-name>
+    <url-pattern>/MenuOptionDAO</url-pattern>
+  </servlet-mapping>
 </web-app>

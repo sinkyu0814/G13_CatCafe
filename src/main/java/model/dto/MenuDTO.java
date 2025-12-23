@@ -1,13 +1,20 @@
 package model.dto;
 
-public class MenuDTO {
+import java.io.Serializable;
+import java.util.List;
+
+public class MenuDTO implements Serializable {
+
 	private int id;
 	private String name;
-	private int quantity;
 	private int price;
-	private String img;
+	private int quantity;
 	private String category;
-	private int isVisible; // ★ 追加
+	private String img;
+	private int isVisible;
+
+	// ★ 追加
+	private List<MenuOptionDTO> options;
 
 	public MenuDTO() {
 	}
@@ -21,6 +28,7 @@ public class MenuDTO {
 		this.category = category;
 	}
 
+	// getter / setter
 	public int getId() {
 		return id;
 	}
@@ -37,14 +45,6 @@ public class MenuDTO {
 		this.name = name;
 	}
 
-	public int getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
-	}
-
 	public int getPrice() {
 		return price;
 	}
@@ -53,12 +53,12 @@ public class MenuDTO {
 		this.price = price;
 	}
 
-	public String getImg() {
-		return img;
+	public int getQuantity() {
+		return quantity;
 	}
 
-	public void setImg(String img) {
-		this.img = img;
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
 
 	public String getCategory() {
@@ -69,12 +69,27 @@ public class MenuDTO {
 		this.category = category;
 	}
 
-	// ★ 表示／非表示
+	public String getImg() {
+		return img;
+	}
+
+	public void setImg(String img) {
+		this.img = img;
+	}
+
 	public int getIsVisible() {
 		return isVisible;
 	}
 
 	public void setIsVisible(int isVisible) {
 		this.isVisible = isVisible;
+	}
+
+	public List<MenuOptionDTO> getOptions() {
+		return options;
+	}
+
+	public void setOptions(List<MenuOptionDTO> options) {
+		this.options = options;
 	}
 }
