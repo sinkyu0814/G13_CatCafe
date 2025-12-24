@@ -1,6 +1,7 @@
 package model.dto;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public class KitchenOrderDTO {
 
@@ -9,6 +10,9 @@ public class KitchenOrderDTO {
 	private Timestamp orderDate;
 	private String goodsName;
 	private int quantity;
+
+	// キッチン表示用にオプション名を文字列のリストで保持
+	private List<String> options;
 
 	public long getOrderId() {
 		return orderId;
@@ -48,5 +52,14 @@ public class KitchenOrderDTO {
 
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
+	}
+
+	// 追加した Getter / Setter
+	public List<String> getOptions() {
+		return options;
+	}
+
+	public void setOptions(List<String> options) {
+		this.options = options;
 	}
 }

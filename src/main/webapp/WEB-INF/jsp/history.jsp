@@ -128,20 +128,31 @@ body {
 				<tbody>
 					<c:forEach var="item" items="${orderItems}">
 						<tr>
-							<td><c:choose>
-									<c:when test="${not empty item.image}">
-										<img
-											src="${pageContext.request.contextPath}/assets/images/${item.image}"
-											width="50" height="50" style="object-fit: cover;">
-									</c:when>
-									<c:otherwise>
-										No Image
-									</c:otherwise>
-								</c:choose></td>
-							<td>${item.name}</td>
-							<td>${item.price}円</td>
-							<td>${item.quantity}個</td>
-						</tr>
+            <td>
+                <c:choose>
+                    <c:when test="${not empty item.image}">
+                        <img src="${pageContext.request.contextPath}/assets/images/${item.image}" width="50" height="50" style="object-fit: cover;">
+                    </c:when>
+                    <c:otherwise>No Image</c:otherwise>
+                </c:choose>
+            </td>
+            <td>
+                <div>${item.name}</div>
+                <c:forEach var="opt" items="${item.selectedOptions}">
+                    <div style="font-size: 0.8em; color: #666; margin-left: 10px;">
+                        + ${opt.optionName} (+${opt.optionPrice}円)
+                    </div>
+                </c:forEach>
+            </td>
+            <td>
+                ${item.price}円
+                <c:if test="${not empty item.selectedOptions}">
+									<div style="font-size: 0.8em; color: #888;">(計:
+										${item.price + item.optionTotalPrice}円)</div>
+								</c:if>
+							</td>
+            <td>${item.quantity}個</td>
+        </tr>
 					</c:forEach>
 
 					<c:if test="${empty orderItems}">

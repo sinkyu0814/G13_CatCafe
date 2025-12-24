@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import model.dto.MenuOptionDTO;
 import viewmodel.CartItem;
 
 public class CartDAO {
@@ -125,45 +126,84 @@ public class CartDAO {
 	 * 既存の orderId に対して order_items を登録する
 	 */
 	public void insertOrderItems(int orderId, List<CartItem> cart) throws Exception {
-
 		Connection conn = null;
-		PreparedStatement ps = null;
+		PreparedStatement psItem = null;
+		PreparedStatement psOpt = null;
+		ResultSet rs = null;
 
 		try {
 			conn = DBManager.getConnection();
-			conn.setAutoCommit(false);
+			conn.setAutoCommit(false); // トランザクション開始
 
-			String sql = "INSERT INTO order_items "
-					+ "(order_item_id, order_id, menu_id, goods_name, price, quantity) "
+			// 1. 商品を登録するSQL（採番されたIDを戻り値として受け取る設定）
+			String sqlItem = "INSERT INTO order_items (order_item_id, order_id, menu_id, goods_name, price, quantity) "
 					+ "VALUES (seq_order_items.nextval, ?, ?, ?, ?, ?)";
+			// 第2引数で生成された主キー列を指定
+			psItem = conn.prepareStatement(sqlItem, new String[] { "order_item_id" });
 
-			ps = conn.prepareStatement(sql);
+			// 2. オプションを登録するSQL
+			String sqlOpt = "INSERT INTO order_item_options (order_item_id, option_id, option_name, option_price) "
+					+ "VALUES (?, ?, ?, ?)";
+			psOpt = conn.prepareStatement(sqlOpt);
 
 			for (CartItem ci : cart) {
-				ps.setInt(1, orderId);
-				ps.setString(2, String.valueOf(ci.getGoodsId()));
-				ps.setString(3, ci.getGoodsName());
-				ps.setInt(4, ci.getPrice());
-				ps.setInt(5, ci.getQuantity());
-				ps.addBatch();
+				// 商品のインサート
+				psItem.setInt(1, orderId);
+				psItem.setString(2, String.valueOf(ci.getGoodsId()));
+				psItem.setString(3, ci.getGoodsName());
+				psItem.setInt(4, ci.getPrice());
+				psItem.setInt(5, ci.getQuantity());
+				psItem.executeUpdate();
+
+				// 今インサートした商品の order_item_id を取得
+				rs = psItem.getGeneratedKeys();
+				if (rs.next()) {
+					int newItemId = rs.getInt(1);
+
+					// その商品にオプションが選択されている場合、すべて登録
+					if (ci.getSelectedOptions() != null && !ci.getSelectedOptions().isEmpty()) {
+						for (MenuOptionDTO opt : ci.getSelectedOptions()) {
+							psOpt.setInt(1, newItemId);
+							psOpt.setInt(2, opt.getOptionId());
+							psOpt.setString(3, opt.getOptionName());
+							psOpt.setInt(4, opt.getOptionPrice());
+							psOpt.executeUpdate();
+						}
+					}
+				}
 			}
 
-			ps.executeBatch();
-			conn.commit();
-
+			conn.commit(); // すべて成功したらコミット
 		} catch (Exception e) {
-			if (conn != null)
-				conn.rollback();
-			throw e;
-
-		} finally {
-			if (ps != null)
-				ps.close();
 			if (conn != null) {
-				conn.setAutoCommit(true);
-				conn.close();
+				try {
+					conn.rollback();
+				} catch (SQLException se) {
+					se.printStackTrace();
+				}
 			}
+			throw e;
+		} finally {
+			if (rs != null)
+				try {
+					rs.close();
+				} catch (Exception e) {
+				}
+			if (psItem != null)
+				try {
+					psItem.close();
+				} catch (Exception e) {
+				}
+			if (psOpt != null)
+				try {
+					psOpt.close();
+				} catch (Exception e) {
+				}
+			if (conn != null)
+				try {
+					conn.close();
+				} catch (Exception e) {
+				}
 		}
-
 	}
 }

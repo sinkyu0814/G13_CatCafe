@@ -116,11 +116,20 @@ body {
 							<td><c:if test="${not empty item.image}">
 									<img src="assets/images/${item.image}" width="60" height="60"
 										style="object-fit: cover;">
-								</c:if> <c:if test="${empty item.image}">
-									No Image
-								</c:if></td>
-							<td>${item.name}</td>
-							<td>${item.price}円</td>
+								</c:if> <c:if test="${empty item.image}">No Image</c:if></td>
+							<td><strong>${item.name}</strong>
+								<ul
+									style="list-style: none; padding: 0; margin: 5px 0 0 10px; font-size: 0.9em; color: #555;">
+									<c:forEach var="opt" items="${item.selectedOptions}">
+										<li>・${opt.optionName} (+${opt.optionPrice}円)</li>
+									</c:forEach>
+								</ul></td>
+							<td>${item.price}円 <c:if
+									test="${not empty item.selectedOptions}">
+									<div style="font-size: 0.8em; color: #999;">小計:
+										${item.price + item.optionTotalPrice}円</div>
+								</c:if>
+							</td>
 							<td>${item.quantity}個</td>
 						</tr>
 					</c:forEach>

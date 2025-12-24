@@ -5,7 +5,12 @@ import java.util.List;
 
 import model.dto.MenuOptionDTO;
 
+/**
+ * カート内商品保持用ViewModel
+ * カートに追加された商品と選択されたオプション、および計算ロジックを保持します。
+ */
 public class CartItem implements Serializable {
+	private static final long serialVersionUID = 1L;
 
 	private int goodsId; // menu_id
 	private String goodsName; // 商品名
@@ -22,6 +27,8 @@ public class CartItem implements Serializable {
 		this.price = price;
 		this.quantity = quantity;
 	}
+
+	// --- Getter / Setter ---
 
 	public int getGoodsId() {
 		return goodsId;
@@ -63,7 +70,10 @@ public class CartItem implements Serializable {
 		this.selectedOptions = selectedOptions;
 	}
 
-	/** オプション合計 */
+	/**
+	 * 選択されたオプションの合計金額を算出します。
+	 * JSP等で ${item.optionTotalPrice} として呼び出せます。
+	 */
 	public int getOptionTotalPrice() {
 		int total = 0;
 		if (selectedOptions != null) {
@@ -74,7 +84,10 @@ public class CartItem implements Serializable {
 		return total;
 	}
 
-	/** 小計（(単価 + オプション) × 数量） */
+	/**
+	 * 小計（ (単価 + オプション合計) × 数量 ）を算出します。
+	 * JSP等で ${item.totalPrice} として呼び出せます。
+	 */
 	public int getTotalPrice() {
 		return (price + getOptionTotalPrice()) * quantity;
 	}

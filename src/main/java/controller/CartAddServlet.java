@@ -49,10 +49,21 @@ public class CartAddServlet extends HttpServlet {
 
 		int id = Integer.parseInt(request.getParameter("id"));
 		int quantity = Integer.parseInt(request.getParameter("quantity"));
+		String[] optionIds = request.getParameterValues("optionIds");
 
 		// 商品取得
-		model.service.MenuService service = new MenuService();
+		MenuService service = new MenuService();
 		MenuDTO menu = service.getMenuById(id);
+
+		List<MenuOptionDTO> selectedOptions = new ArrayList<>();
+		if (optionIds != null && optionIds.length > 0) {
+			MenuOptionDAO optionDao = new MenuOptionDAO();
+			try {
+				selectedOptions = optionDao.findByIds(optionIds);
+			} catch (Exception e) {
+				throw new ServletException("オプション取得エラー", e);
+			}
+		}
 
 		// セッションからカートを取得
 		HttpSession session = request.getSession();
@@ -64,42 +75,40 @@ public class CartAddServlet extends HttpServlet {
 		// 同じ商品があるなら数量を増やす
 		boolean found = false;
 		for (CartItem item : cart) {
-			if (item.getGoodsId() == id) {
+			// 商品IDが一致し、かつ選択されたオプションの内容が一致するか
+			if (item.getGoodsId() == id && isSameOptions(item.getSelectedOptions(), selectedOptions)) {
 				item.setQuantity(item.getQuantity() + quantity);
 				found = true;
 				break;
 			}
 		}
 
-		// 新規追加
+		// 一致するものがなければ新規追加
 		if (!found) {
-			cart.add(new CartItem(
-					menu.getId(),
-					menu.getName(),
-					menu.getPrice(),
-					quantity));
+			CartItem newItem = new CartItem(menu.getId(), menu.getName(), menu.getPrice(), quantity);
+			newItem.setSelectedOptions(selectedOptions);
+			cart.add(newItem);
 		}
-
-		String[] optionIds = request.getParameterValues("optionIds");
-
-		MenuOptionDAO optionDao = new MenuOptionDAO();
-		List<MenuOptionDTO> selectedOptions = null;
-		try {
-			selectedOptions = optionDao.findByIds(optionIds);
-		} catch (Exception e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
-		}
-
-		CartItem item = new CartItem();
-		item.setGoodsId(menu.getId());
-		item.setGoodsName(menu.getName());
-		item.setPrice(menu.getPrice());
-		item.setQuantity(quantity);
-		item.setSelectedOptions(selectedOptions);
 
 		session.setAttribute("cart", cart);
+		response.sendRedirect("ListServlet");
+	}
 
-		response.sendRedirect("ConfirmServlet");
+	/**
+	 * カート内のアイテムと、新しく追加しようとしているアイテムのオプションが一致するか判定
+	 */
+	private boolean isSameOptions(List<MenuOptionDTO> list1, List<MenuOptionDTO> list2) {
+		if (list1 == null && list2 == null)
+			return true;
+		if (list1 == null || list2 == null)
+			return false;
+		if (list1.size() != list2.size())
+			return false;
+
+		// IDのリストにして比較（順不同に対応するため）
+		List<Integer> ids1 = list1.stream().map(MenuOptionDTO::getOptionId).sorted().toList();
+		List<Integer> ids2 = list2.stream().map(MenuOptionDTO::getOptionId).sorted().toList();
+
+		return ids1.equals(ids2);
 	}
 }

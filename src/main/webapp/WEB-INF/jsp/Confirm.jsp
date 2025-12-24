@@ -13,55 +13,46 @@
 
 	<div style="display: flex; gap: 30px;">
 
-		<!-- 左：画像 -->
 		<div>
 			<img src="assets/images/${menu.img}" width="300">
 		</div>
 
-		<!-- 右：商品情報 -->
 		<div>
 			<h3>${menu.name}</h3>
 			<p>価格：${menu.price}円</p>
 			<p>カテゴリ：${menu.category}</p>
 
 			<form action="CartAddServlet" method="post">
-
-				<input type="hidden" name="id" value="${menu.id}">
-
-				<!-- 数量選択 -->
-				<label>数量：</label> <select name="quantity">
+				<input type="hidden" name="id" value="${menu.id}"> <label>数量：</label>
+				<select name="quantity">
 					<c:forEach var="i" begin="1" end="10">
 						<option value="${i}">${i}</option>
 					</c:forEach>
-				</select> <br>
-				<br>
+				</select> <br> <br>
 
-				<!-- ★ オプション選択 -->
-				<c:if test="${not empty menu.options}">
-					<h4>オプション</h4>
-
-					<c:forEach var="opt" items="${menu.options}">
-						<label> <input type="checkbox" name="optionIds"
-							value="${opt.optionId}">
-							${opt.optionName}（+${opt.optionPrice}円）
-						</label>
-						<br>
-					</c:forEach>
-
+				<c:if test="${not empty options}">
+					<h4>オプション（トッピング）</h4>
+					<div
+						style="background: #f9f9f9; padding: 10px; border-radius: 5px;">
+						<c:forEach var="opt" items="${options}">
+							<label
+								style="display: block; margin-bottom: 5px; cursor: pointer;">
+								<input type="checkbox" name="optionIds" value="${opt.optionId}">
+								${opt.optionName}（+${opt.optionPrice}円）
+							</label>
+						</c:forEach>
+					</div>
 					<br>
 				</c:if>
 
-				<button type="submit">カートに追加</button>
+				<button type="submit">カートに追加する</button>
 			</form>
 
 			<br>
-
 			<form action="ListServlet" method="get">
-				<button type="submit">閉じる</button>
+				<button type="submit">戻る</button>
 			</form>
-
 		</div>
-
 	</div>
 
 </body>

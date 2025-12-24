@@ -13,7 +13,7 @@ public class MenuDTO implements Serializable {
 	private String img;
 	private int isVisible;
 
-	// ★ 追加
+	// オプションリスト
 	private List<MenuOptionDTO> options;
 
 	public MenuDTO() {
@@ -28,7 +28,8 @@ public class MenuDTO implements Serializable {
 		this.category = category;
 	}
 
-	// getter / setter
+	// --- Getter / Setter ---
+
 	public int getId() {
 		return id;
 	}
@@ -85,6 +86,7 @@ public class MenuDTO implements Serializable {
 		this.isVisible = isVisible;
 	}
 
+	// ★ 追加した Setter
 	public List<MenuOptionDTO> getOptions() {
 		return options;
 	}
