@@ -51,8 +51,7 @@ button {
 		<input type="hidden" name="action" value="startAccounting">
 
 		<%
-			Map<Integer, Integer> tablePersonsMap =
-				(Map<Integer, Integer>) request.getAttribute("tablePersonsMap");
+		Map<Integer, Integer> tablePersonsMap = (Map<Integer, Integer>) request.getAttribute("tablePersonsMap");
 		%>
 
 		<div class="table-layout">
@@ -64,9 +63,9 @@ button {
 				if (tablePersonsMap != null && tablePersonsMap.containsKey(i)) {
 					int p = tablePersonsMap.get(i);
 					if (p > 0) {
-						statusText = p + "名";
+				statusText = p + "名";
 					} else {
-						statusText = "？名";
+				statusText = "？名";
 					}
 				}
 			%>
@@ -83,9 +82,22 @@ button {
 		<div style="text-align: center;">
 			<button type="button" onclick="submitForm()">会計開始</button>
 		</div>
+
 	</form>
+	<div
+		style="text-align: center; margin-top: 30px; padding: 20px; border-top: 1px dashed #ccc;">
+		<form action="ResetAllTablesServlet" method="POST"
+			onsubmit="return confirmReset()">
+			<button type="submit"
+				style="background-color: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+				【管理者用】全テーブルを強制空席にする</button>
+		</form>
+	</div>
 
 	<script>
+		function confirmReset() {
+			return confirm("すべてのテーブルの注文を終了し、空席に戻しますか？\nこの操作は取り消せません。");
+		}
 		let currentSelectedTable = null;
 
 		function selectTable(tableNum) {

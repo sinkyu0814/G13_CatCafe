@@ -7,11 +7,12 @@ import java.sql.ResultSet;
 
 import database.DBManager;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
+@WebServlet("/ToppageServlet")
 public class ToppageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

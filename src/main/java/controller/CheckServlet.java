@@ -12,6 +12,7 @@ import java.util.Map;
 import database.DBManager;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,6 +24,7 @@ import viewmodel.OrderItem;
  * 会計確認画面（orderId 基準）
  * オプション料金を含めた詳細と合計金額を取得します。
  */
+@WebServlet("/CheckServlet")
 public class CheckServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

@@ -6,6 +6,7 @@ import java.util.List;
 
 import database.MenuOptionDAO;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,7 +16,7 @@ import model.dto.MenuOptionDTO;
 import model.service.MenuService;
 import viewmodel.CartItem;
 
-//@WebServlet("/CartAddServlet")
+@WebServlet("/CartAddServlet")
 /**
  * Servlet implementation class CartAddServlet
  */

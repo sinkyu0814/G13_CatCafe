@@ -96,7 +96,7 @@
 
 	<hr>
 
-	<form action="index.html">
+	<form action="AdminServlet">
 		<button>戻る</button>
 	</form>
 

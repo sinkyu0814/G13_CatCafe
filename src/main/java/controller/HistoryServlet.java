@@ -13,13 +13,14 @@ import java.util.Map;
 import database.DBManager;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.dto.MenuOptionDTO;
 import viewmodel.OrderItem;
-
+@WebServlet("/HistoryServlet")
 public class HistoryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
