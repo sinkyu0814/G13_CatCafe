@@ -8,22 +8,22 @@ import model.dto.MenuOptionDTO;
 
 /**
  * 注文明細表示用ViewModel
- * DBのorder_itemsテーブルおよび関連する注文情報を保持します。
+ * JSPの ${item.selectedOptions} および ${item.optionTotalPrice} に完全対応させたバージョンです。
  */
 public class OrderItem implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	// 商品・明細情報
 	private int orderItemId;
 	private int orderId;
 	private String menuId;
-	private String name; // JSPで ${item.name} としてアクセス
+	private String name;
 	private int price;
 	private int quantity;
 	private String image;
-	private List<MenuOptionDTO> options;
 
-	// 注文全体に関わる情報
+	// ★ 重要：JSPの ${item.selectedOptions} に合わせるため名前を修正
+	private List<MenuOptionDTO> selectedOptions;
+
 	private Timestamp orderTime;
 	private String status;
 	private int tableNo;
@@ -89,12 +89,13 @@ public class OrderItem implements Serializable {
 		this.image = image;
 	}
 
-	public List<MenuOptionDTO> getOptions() {
-		return options;
+	// ★ 重要：JSPから呼ばれるGetter
+	public List<MenuOptionDTO> getSelectedOptions() {
+		return selectedOptions;
 	}
 
-	public void setOptions(List<MenuOptionDTO> options) {
-		this.options = options;
+	public void setSelectedOptions(List<MenuOptionDTO> selectedOptions) {
+		this.selectedOptions = selectedOptions;
 	}
 
 	public Timestamp getOrderTime() {
@@ -122,10 +123,24 @@ public class OrderItem implements Serializable {
 	}
 
 	/**
-	 * 小計（価格 × 個数）を取得します。
-	 * JSP等で ${item.subtotal} として呼び出せます。
+	 * 小計（商品単価 × 個数）
+	 * JSPで ${item.subtotal} として使用
 	 */
 	public int getSubtotal() {
 		return this.price * this.quantity;
+	}
+
+	/**
+	 * オプション合計金額
+	 * JSPで ${item.optionTotalPrice} として使用
+	 */
+	public int getOptionTotalPrice() {
+		int total = 0;
+		if (selectedOptions != null) {
+			for (MenuOptionDTO opt : selectedOptions) {
+				total += opt.getOptionPrice();
+			}
+		}
+		return total;
 	}
 }

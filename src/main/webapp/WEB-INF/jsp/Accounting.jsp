@@ -98,29 +98,40 @@ th, td {
 					<tr>
 						<th>商品名</th>
 						<th>数量</th>
-						<th>単価</th>
+						<th>金額（単価+オプション）</th>
 					</tr>
 				</thead>
 				<tbody>
 					<%
-					if (orderList != null && !orderList.isEmpty()) {
-						for (OrderItem item : orderList) {
-					%>
+            if (orderList != null && !orderList.isEmpty()) {
+                for (OrderItem item : orderList) {
+            %>
 					<tr>
-						<td><%=item.getName()%></td>
+						<td><strong><%=item.getName()%></strong> <%-- ★ オプションの表示ループを追加 --%>
+							<% if (item.getSelectedOptions() != null && !item.getSelectedOptions().isEmpty()) { %>
+							<ul
+								style="list-style: none; padding: 0; margin: 5px 0 0 10px; font-size: 0.85em; color: #666;">
+								<% for (model.dto.MenuOptionDTO opt : item.getSelectedOptions()) { %>
+								<li>・<%=opt.getOptionName()%> (+<%=opt.getOptionPrice()%>円)
+								</li>
+								<% } %>
+							</ul> <% } %></td>
 						<td><%=item.getQuantity()%></td>
-						<td><%=item.getPrice()%> 円</td>
+						<td><%=item.getPrice() + item.getOptionTotalPrice()%> 円 <% if (item.getQuantity() > 1) { %>
+							<div style="font-size: 0.8em; color: #999;">
+								(小計:
+								<%= (item.getPrice() + item.getOptionTotalPrice()) * item.getQuantity() %>
+								円)
+							</div> <% } %></td>
 					</tr>
 					<%
-					}
-					} else {
-					%>
+                }
+            } else {
+            %>
 					<tr>
 						<td colspan="3">注文がありません</td>
 					</tr>
-					<%
-					}
-					%>
+					<% } %>
 				</tbody>
 			</table>
 		</div>

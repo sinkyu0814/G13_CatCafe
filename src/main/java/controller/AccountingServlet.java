@@ -5,7 +5,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import database.DBManager;
 import jakarta.servlet.ServletException;
@@ -13,14 +15,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import model.dto.MenuOptionDTO;
 import viewmodel.OrderItem;
 
 public class AccountingServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	// =========================
-	// 会計画面表示（GET）
-	// =========================
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -30,8 +30,7 @@ public class AccountingServlet extends HttpServlet {
 
 		if (orderId == null) {
 			request.setAttribute("error", "注文情報が取得できません");
-			request.getRequestDispatcher("/WEB-INF/jsp/Accounting.jsp")
-					.forward(request, response);
+			request.getRequestDispatcher("/WEB-INF/jsp/Accounting.jsp").forward(request, response);
 			return;
 		}
 
@@ -41,31 +40,59 @@ public class AccountingServlet extends HttpServlet {
 
 		try (Connection conn = DBManager.getConnection()) {
 
+			// ★ オプション情報を取得するSQLに修正
 			String sql = """
 					SELECT o.table_no,
-						   oi.goods_name,
-						   oi.price,
-						   oi.quantity
+					       oi.order_item_id,
+					       oi.goods_name,
+					       oi.price,
+					       oi.quantity,
+					       oio.option_name,
+					       oio.option_price
 					FROM orders o
 					JOIN order_items oi ON o.order_id = oi.order_id
+					LEFT JOIN order_item_options oio ON oi.order_item_id = oio.order_item_id
 					WHERE o.order_id = ? AND o.status = 'NEW'
+					ORDER BY oi.order_item_id ASC
 					""";
 
 			try (PreparedStatement ps = conn.prepareStatement(sql)) {
 				ps.setInt(1, orderId);
 
 				try (ResultSet rs = ps.executeQuery()) {
-					while (rs.next()) {
+					// 履歴画面と同じMapによる集約ロジック
+					Map<Integer, OrderItem> itemMap = new LinkedHashMap<>();
 
+					while (rs.next()) {
+						int itemId = rs.getInt("order_item_id");
 						tableNo = rs.getInt("table_no");
 
-						OrderItem item = new OrderItem();
-						item.setName(rs.getString("goods_name"));
-						item.setPrice(rs.getInt("price"));
-						item.setQuantity(rs.getInt("quantity"));
+						OrderItem item = itemMap.get(itemId);
+						if (item == null) {
+							item = new OrderItem();
+							item.setOrderItemId(itemId);
+							item.setName(rs.getString("goods_name"));
+							item.setPrice(rs.getInt("price"));
+							item.setQuantity(rs.getInt("quantity"));
+							item.setSelectedOptions(new ArrayList<>());
+							itemMap.put(itemId, item);
+						}
 
-						list.add(item);
-						totalAmount += item.getSubtotal();
+						// オプションがあれば追加
+						String optName = rs.getString("option_name");
+						if (optName != null) {
+							MenuOptionDTO opt = new MenuOptionDTO();
+							opt.setOptionName(optName);
+							opt.setOptionPrice(rs.getInt("option_price"));
+							item.getSelectedOptions().add(opt);
+						}
+					}
+					list = new ArrayList<>(itemMap.values());
+
+					// ★ 合計金額の計算（(商品単価 + オプション単価合計) × 数量）
+					for (OrderItem oi : list) {
+						int itemFullPrice = oi.getPrice() + oi.getOptionTotalPrice();
+						totalAmount += itemFullPrice * oi.getQuantity();
 					}
 				}
 			}
@@ -77,9 +104,9 @@ public class AccountingServlet extends HttpServlet {
 		request.setAttribute("orderList", list);
 		request.setAttribute("totalAmount", totalAmount);
 		request.setAttribute("tableNo", tableNo);
+		request.setAttribute("orderId", orderId);
 
-		request.getRequestDispatcher("/WEB-INF/jsp/Accounting.jsp")
-				.forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/jsp/Accounting.jsp").forward(request, response);
 	}
 
 	// =========================

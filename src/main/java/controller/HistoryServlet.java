@@ -84,7 +84,7 @@ public class HistoryServlet extends HttpServlet {
 							item.setPrice(rs.getInt("price"));
 							item.setQuantity(rs.getInt("quantity"));
 							item.setImage(rs.getString("image"));
-							item.setOptions(new ArrayList<>()); // OrderItemにList<MenuOptionDTO> optionsが必要
+							item.setSelectedOptions(new ArrayList<>()); // OrderItemにList<MenuOptionDTO> optionsが必要
 
 							itemMap.put(itemId, item);
 
@@ -99,7 +99,7 @@ public class HistoryServlet extends HttpServlet {
 							MenuOptionDTO opt = new MenuOptionDTO();
 							opt.setOptionName(optName);
 							opt.setOptionPrice(rs.getInt("option_price"));
-							item.getOptions().add(opt);
+							item.getSelectedOptions().add(opt);
 						}
 					}
 					historyList = new ArrayList<>(itemMap.values());
@@ -107,7 +107,7 @@ public class HistoryServlet extends HttpServlet {
 					// 合計金額の計算（商品価格＋オプション価格の合計 × 数量）
 					for (OrderItem oi : historyList) {
 						int itemPriceSum = oi.getPrice();
-						for (MenuOptionDTO o : oi.getOptions()) {
+						for (MenuOptionDTO o : oi.getSelectedOptions()) {
 							itemPriceSum += o.getOptionPrice();
 						}
 						totalAmount += itemPriceSum * oi.getQuantity();
