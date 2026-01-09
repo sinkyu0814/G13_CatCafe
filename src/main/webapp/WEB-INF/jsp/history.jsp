@@ -108,7 +108,7 @@ body {
 
 	<header class="page-header">
 		<h1>注文履歴（テーブル ${tableNo} ／ 注文ID ${orderId}）</h1>
-		<button onclick="location.href='TableSelectServlet'">閉じる</button>
+		<button onclick="location.href='ListServlet'">閉じる</button>
 	</header>
 
 	<div class="main-content">
