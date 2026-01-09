@@ -51,6 +51,10 @@
 		<form action="HistoryServlet" method="get">
 			<button>注文履歴を見る</button>
 		</form>
+		<form action="CheckServlet" method="GET"
+			style="margin: 0; padding: 0; width: 100%;">
+			<button type="submit" class="checkout-button">会計</button>
+		</form>
 	</div>
 
 </body>
