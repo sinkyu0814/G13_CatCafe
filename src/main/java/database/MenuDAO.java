@@ -24,7 +24,7 @@ public class MenuDAO {
 					WHERE m.menu_id = ?
 				""";
 
-		
+	
 		try (Connection con = DBManager.getConnection();
 				PreparedStatement ps = con.prepareStatement(sql)) {
 

@@ -13,7 +13,6 @@ public class MenuDTO implements Serializable {
 	private String category;
 	private String img;
 	private int isVisible;
-
 	// オプションリスト
 	private List<MenuOptionDTO> options;
 

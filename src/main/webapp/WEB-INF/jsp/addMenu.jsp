@@ -4,7 +4,6 @@
 <head>
 <title>メニュー管理</title>
 <style>
-
 table {
 	width: 100%;
 	border-collapse: collapse;

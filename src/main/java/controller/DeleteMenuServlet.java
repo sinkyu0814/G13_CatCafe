@@ -15,7 +15,6 @@ public class DeleteMenuServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		String menuIdStr = request.getParameter("menuId");
 
 		if (menuIdStr != null) {

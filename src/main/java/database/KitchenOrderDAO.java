@@ -21,7 +21,8 @@ public class KitchenOrderDAO {
 	public List<KitchenOrderDTO> findDeliveredOrders() throws Exception {
 		return findByStatus("DELIVERED");
 	}
-
+	
+	
 	private List<KitchenOrderDTO> findByStatus(String mode) throws Exception {
 		Map<Integer, KitchenOrderDTO> map = new LinkedHashMap<>();
 		String statusCondition = mode.equals("DELIVERED") ? "= 'DELIVERED'" : "!= 'DELIVERED'";

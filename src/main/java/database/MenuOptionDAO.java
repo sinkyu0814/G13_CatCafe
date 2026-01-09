@@ -12,7 +12,6 @@ public class MenuOptionDAO {
 
 	public List<MenuOptionDTO> findByMenuId(int menuId) throws Exception {
 		List<MenuOptionDTO> list = new ArrayList<>();
-
 		String sql = """
 				    SELECT option_id, menu_id, option_name, option_price
 				    FROM menu_options

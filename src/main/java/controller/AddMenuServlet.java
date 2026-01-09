@@ -29,7 +29,6 @@ public class AddMenuServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		// ★ メニュー一覧取得
 		MenuService service = new MenuService();
 		List<MenuDTO> menuList = service.getMenuList("all");

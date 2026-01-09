@@ -16,6 +16,7 @@ public class DeleteMenuOptionServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		
 		// JSPの <input name="optionId"> から値を取得
 		String idStr = request.getParameter("optionId");
 
