@@ -10,6 +10,7 @@
 
 <style type="text/css">
 /* 元のスタイルそのまま */
+
 body {
 	font-family: sans-serif;
 	margin: 0;

@@ -13,6 +13,7 @@ public class KitchenOrderDTO {
 	private String kitchenStatus; // ★追加：ステータス保持
 	private List<String> options;
 
+	
 	// Getter / Setter
 	public long getOrderId() {
 		return orderId;

@@ -38,6 +38,7 @@ public class MenuOptionDAO {
 		}
 		return list;
 	}
+	
 
 	public List<MenuOptionDTO> findByIds(String[] ids) throws Exception {
 		List<MenuOptionDTO> list = new ArrayList<>();

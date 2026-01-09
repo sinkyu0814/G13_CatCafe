@@ -11,6 +11,7 @@
 		<button onclick="location.href='KitchenOrderServlet'">キッチン画面に戻る</button>
 	</p>
 
+
 	<table border="1" style="width: 100%; border-collapse: collapse;">
 		<tr bgcolor="#eee">
 			<th>卓</th>

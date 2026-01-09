@@ -39,6 +39,7 @@ public class AddMenuServlet extends HttpServlet {
 		rd.forward(request, response);
 	}
 
+	
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {

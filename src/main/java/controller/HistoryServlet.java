@@ -41,6 +41,7 @@ public class HistoryServlet extends HttpServlet {
 		List<OrderItem> historyList = new ArrayList<>();
 		int totalAmount = 0;
 		Integer tableNo = null;
+		
 
 		/*━━━━━━━━━━━━━━━━━━━━━
 		 * 2. DBから注文履歴を取得

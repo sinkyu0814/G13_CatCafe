@@ -5,6 +5,7 @@ import java.util.List;
 
 public class MenuDTO implements Serializable {
 
+	
 	private int id;
 	private String name;
 	private int price;

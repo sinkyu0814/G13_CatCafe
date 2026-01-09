@@ -8,6 +8,7 @@ public class MenuOptionDTO implements Serializable {
 	private String optionName;
 	private int optionPrice;
 
+	
 	public int getOptionId() {
 		return optionId;
 	}
