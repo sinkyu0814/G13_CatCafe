@@ -4,22 +4,30 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public class KitchenOrderDTO {
-
 	private long orderId;
+	private int orderItemId; // ★追加：行を特定するために必要
 	private String tableNo;
 	private Timestamp orderDate;
 	private String goodsName;
 	private int quantity;
-
-	// キッチン表示用にオプション名を文字列のリストで保持
+	private String kitchenStatus; // ★追加：ステータス保持
 	private List<String> options;
 
+	// Getter / Setter
 	public long getOrderId() {
 		return orderId;
 	}
 
 	public void setOrderId(long orderId) {
 		this.orderId = orderId;
+	}
+
+	public int getOrderItemId() {
+		return orderItemId;
+	}
+
+	public void setOrderItemId(int orderItemId) {
+		this.orderItemId = orderItemId;
 	}
 
 	public String getTableNo() {
@@ -54,7 +62,14 @@ public class KitchenOrderDTO {
 		this.quantity = quantity;
 	}
 
-	// 追加した Getter / Setter
+	public String getKitchenStatus() {
+		return kitchenStatus;
+	}
+
+	public void setKitchenStatus(String kitchenStatus) {
+		this.kitchenStatus = kitchenStatus;
+	}
+
 	public List<String> getOptions() {
 		return options;
 	}

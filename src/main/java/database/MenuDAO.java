@@ -4,42 +4,61 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import model.dto.MenuDTO;
+import model.dto.MenuOptionDTO;
 
 public class MenuDAO {
 
+	// IDで検索（オプション情報も含む）
 	public MenuDTO findById(int id) {
+		MenuDTO dto = null;
 		String sql = """
-					SELECT menu_id, name, quantity, price, image, category, is_visible
-					FROM menus
-					WHERE menu_id = ?
+					SELECT m.menu_id, m.name, m.quantity, m.price, m.image, m.category, m.is_visible,
+					       mo.option_id, mo.option_name, mo.option_price
+					FROM menus m
+					LEFT JOIN menu_options mo ON m.menu_id = mo.menu_id
+					WHERE m.menu_id = ?
 				""";
 
 		try (Connection con = DBManager.getConnection();
 				PreparedStatement ps = con.prepareStatement(sql)) {
 
 			ps.setInt(1, id);
-			ResultSet rs = ps.executeQuery();
-
-			if (rs.next()) {
-				return mapToDTO(rs);
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					if (dto == null) {
+						dto = mapToDTO(rs);
+						dto.setOptions(new ArrayList<>());
+					}
+					int optId = rs.getInt("option_id");
+					if (optId != 0) {
+						MenuOptionDTO opt = new MenuOptionDTO();
+						opt.setOptionId(optId);
+						opt.setOptionName(rs.getString("option_name"));
+						opt.setOptionPrice(rs.getInt("option_price"));
+						dto.getOptions().add(opt);
+					}
+				}
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return dto;
 	}
 
-	// 管理画面用（全件）
+	// 管理画面用（全件取得 & オプション情報取得）
 	public List<MenuDTO> findAll() {
-		List<MenuDTO> list = new ArrayList<>();
+		Map<Integer, MenuDTO> map = new LinkedHashMap<>();
 		String sql = """
-					SELECT menu_id, name, quantity, price, image, category, is_visible
-					FROM menus
-					ORDER BY menu_id
+					SELECT m.menu_id, m.name, m.quantity, m.price, m.image, m.category, m.is_visible,
+					       mo.option_id, mo.option_name, mo.option_price
+					FROM menus m
+					LEFT JOIN menu_options mo ON m.menu_id = mo.menu_id
+					ORDER BY m.menu_id
 				""";
 
 		try (Connection con = DBManager.getConnection();
@@ -47,58 +66,82 @@ public class MenuDAO {
 				ResultSet rs = ps.executeQuery()) {
 
 			while (rs.next()) {
-				list.add(mapToDTO(rs));
-			}
+				int menuId = rs.getInt("menu_id");
+				MenuDTO dto = map.get(menuId);
 
+				if (dto == null) {
+					dto = mapToDTO(rs);
+					dto.setOptions(new ArrayList<>());
+					map.put(menuId, dto);
+				}
+
+				int optId = rs.getInt("option_id");
+				if (optId != 0) {
+					MenuOptionDTO opt = new MenuOptionDTO();
+					opt.setOptionId(optId);
+					opt.setOptionName(rs.getString("option_name"));
+					opt.setOptionPrice(rs.getInt("option_price"));
+					dto.getOptions().add(opt);
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return list;
+		return new ArrayList<>(map.values());
 	}
 
-	// お客様画面用（表示中のみ）
+	// お客様画面用（表示中のみ & カテゴリ絞り込み）
+	// ※お客様画面でもオプションが必要なため同様のロジックを適用
 	public List<MenuDTO> findByCategory(String category) {
-		List<MenuDTO> list = new ArrayList<>();
+		Map<Integer, MenuDTO> map = new LinkedHashMap<>();
 		String sql = """
-					SELECT menu_id, name, quantity, price, image, category, is_visible
-					FROM menus
-					WHERE category = ?
-					  AND is_visible = 1
+					SELECT m.menu_id, m.name, m.quantity, m.price, m.image, m.category, m.is_visible,
+					       mo.option_id, mo.option_name, mo.option_price
+					FROM menus m
+					LEFT JOIN menu_options mo ON m.menu_id = mo.menu_id
+					WHERE m.category = ? AND m.is_visible = 1
+					ORDER BY m.menu_id
 				""";
 
 		try (Connection con = DBManager.getConnection();
 				PreparedStatement ps = con.prepareStatement(sql)) {
 
 			ps.setString(1, category);
-			ResultSet rs = ps.executeQuery();
-
-			while (rs.next()) {
-				list.add(mapToDTO(rs));
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					int menuId = rs.getInt("menu_id");
+					MenuDTO dto = map.get(menuId);
+					if (dto == null) {
+						dto = mapToDTO(rs);
+						dto.setOptions(new ArrayList<>());
+						map.put(menuId, dto);
+					}
+					int optId = rs.getInt("option_id");
+					if (optId != 0) {
+						MenuOptionDTO opt = new MenuOptionDTO();
+						opt.setOptionId(optId);
+						opt.setOptionName(rs.getString("option_name"));
+						opt.setOptionPrice(rs.getInt("option_price"));
+						dto.getOptions().add(opt);
+					}
+				}
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return list;
+		return new ArrayList<>(map.values());
 	}
 
 	public List<String> getCategoryList() {
 		List<String> list = new ArrayList<>();
-		String sql = """
-					SELECT DISTINCT category
-					FROM menus
-					WHERE is_visible = 1
-					ORDER BY category
-				""";
+		String sql = "SELECT DISTINCT category FROM menus WHERE is_visible = 1 ORDER BY category";
 
 		try (Connection con = DBManager.getConnection();
 				PreparedStatement ps = con.prepareStatement(sql);
 				ResultSet rs = ps.executeQuery()) {
-
 			while (rs.next()) {
 				list.add(rs.getString("category"));
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -118,15 +161,9 @@ public class MenuDAO {
 	}
 
 	public void addMenu(String name, int price, int quantity, String category, String image) throws Exception {
-		String sql = """
-					INSERT INTO menus
-					(menu_id, name, price, quantity, category, image, is_visible)
-					VALUES (menus_seq.nextval, ?, ?, ?, ?, ?, 1)
-				""";
-
+		String sql = "INSERT INTO menus (menu_id, name, price, quantity, category, image, is_visible) VALUES (menus_seq.nextval, ?, ?, ?, ?, ?, 1)";
 		try (Connection conn = DBManager.getConnection();
 				PreparedStatement ps = conn.prepareStatement(sql)) {
-
 			ps.setString(1, name);
 			ps.setInt(2, price);
 			ps.setInt(3, quantity);
@@ -136,27 +173,42 @@ public class MenuDAO {
 		}
 	}
 
-	// ★ 論理削除
 	public void updateVisible(int menuId, int visible) throws Exception {
 		String sql = "UPDATE menus SET is_visible = ? WHERE menu_id = ?";
-
 		try (Connection conn = DBManager.getConnection();
 				PreparedStatement ps = conn.prepareStatement(sql)) {
-
 			ps.setInt(1, visible);
 			ps.setInt(2, menuId);
 			ps.executeUpdate();
 		}
 	}
 
-	// ★ 物理削除
 	public void deleteMenu(int menuId) throws Exception {
-		String sql = "DELETE FROM menus WHERE menu_id = ?";
+		// 先にオプションを削除（外部キー制約がある場合）
+		String sqlOpt = "DELETE FROM menu_options WHERE menu_id = ?";
+		String sqlMenu = "DELETE FROM menus WHERE menu_id = ?";
+		try (Connection conn = DBManager.getConnection()) {
+			conn.setAutoCommit(false);
+			try (PreparedStatement ps1 = conn.prepareStatement(sqlOpt);
+					PreparedStatement ps2 = conn.prepareStatement(sqlMenu)) {
+				ps1.setInt(1, menuId);
+				ps1.executeUpdate();
+				ps2.setInt(1, menuId);
+				ps2.executeUpdate();
+				conn.commit();
+			} catch (Exception e) {
+				conn.rollback();
+				throw e;
+			}
+		}
+	}
 
+	// ★ オプション単体の削除メソッド（DeleteMenuOptionServlet から呼ぶ用）
+	public void deleteOption(int optionId) throws Exception {
+		String sql = "DELETE FROM menu_options WHERE option_id = ?";
 		try (Connection conn = DBManager.getConnection();
 				PreparedStatement ps = conn.prepareStatement(sql)) {
-
-			ps.setInt(1, menuId);
+			ps.setInt(1, optionId);
 			ps.executeUpdate();
 		}
 	}

@@ -9,26 +9,27 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/AddMenuOptionServlet")
-public class AddMenuOptionServlet extends HttpServlet {
+@WebServlet("/DeleteMenuOptionServlet")
+public class DeleteMenuOptionServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		try {
-			int menuId = Integer.parseInt(request.getParameter("menuId"));
-			String name = request.getParameter("optionName");
-			int price = Integer.parseInt(request.getParameter("optionPrice"));
+		// JSPの <input name="optionId"> から値を取得
+		String idStr = request.getParameter("optionId");
 
+		if (idStr != null && !idStr.isEmpty()) {
+			int optionId = Integer.parseInt(idStr);
 			MenuOptionDAO dao = new MenuOptionDAO();
-			dao.insert(menuId, name, price);
-
-		} catch (Exception e) {
-			e.printStackTrace();
+			try {
+				dao.delete(optionId);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
-		// 追加が終わったら一覧画面へ戻る
+		// メニュー一覧画面へ戻る
 		response.sendRedirect("AddMenuServlet");
 	}
 }

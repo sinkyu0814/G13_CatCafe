@@ -94,4 +94,13 @@ public class MenuOptionDAO {
 			ps.executeUpdate();
 		}
 	}
+
+	public void delete(int optionId) throws Exception {
+		String sql = "DELETE FROM menu_options WHERE option_id = ?";
+		try (Connection conn = DBManager.getConnection();
+				PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setInt(1, optionId);
+			ps.executeUpdate();
+		}
+	}
 }
