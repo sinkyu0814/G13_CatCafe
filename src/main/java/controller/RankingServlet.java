@@ -18,15 +18,19 @@ public class RankingServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		// --- 追加：集計タイプの取得 (all: セット, item: 商品のみ, option: オプションのみ) ---
+		String filterType = request.getParameter("filterType");
+		if (filterType == null)
+			filterType = "all";
+
 		String period = request.getParameter("period");
 		if (period == null)
-			period = "day"; // 初期表示は「本日」
+			period = "day";
 
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime start;
 		String label;
 
-		// 期間の計算
 		if ("week".equals(period)) {
 			start = now.minusWeeks(1);
 			label = "1週間";
@@ -37,7 +41,6 @@ public class RankingServlet extends HttpServlet {
 			start = now.minusYears(1);
 			label = "1年";
 		} else {
-			// 「本日」は今日の 00:00:00 から
 			start = now.withHour(0).withMinute(0).withSecond(0).withNano(0);
 			label = "本日";
 		}
@@ -45,13 +48,9 @@ public class RankingServlet extends HttpServlet {
 		String startDateStr = start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
 		RankingDAO dao = new RankingDAO();
-		List<RankingDTO> list = dao.getTopTenRanking(startDateStr);
-		int total = dao.getTotalOrderCount(startDateStr);
-
-		// --- デバッグログ ---
-		System.out.println("検索条件: " + label + " (" + startDateStr + " 以降)");
-		System.out.println("データ取得数: " + list.size() + " 件");
-		// ------------------
+		// DAOに filterType を渡す
+		List<RankingDTO> list = dao.getTopTenRanking(startDateStr, filterType);
+		int total = dao.getTotalOrderCount(startDateStr, filterType);
 
 		for (RankingDTO item : list) {
 			if (total > 0) {
@@ -64,6 +63,8 @@ public class RankingServlet extends HttpServlet {
 		request.setAttribute("totalCount", total);
 		request.setAttribute("periodLabel", label);
 		request.setAttribute("currentPeriod", period);
+		request.setAttribute("selectedFilter", filterType); // JSPに現在の選択を戻す
+
 		request.getRequestDispatcher("/WEB-INF/jsp/Ranking.jsp").forward(request, response);
 	}
 }

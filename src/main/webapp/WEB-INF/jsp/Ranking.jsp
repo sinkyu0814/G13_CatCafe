@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>商品ランキング</title>
+<title>商品・オプションランキング</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 body {
@@ -29,6 +29,10 @@ body {
 	margin-bottom: 20px;
 }
 
+.filter-area {
+	margin-bottom: 30px;
+}
+
 .filter-links {
 	margin: 20px 0;
 	display: flex;
@@ -49,6 +53,15 @@ body {
 .filter-links a.active {
 	background: #3498db;
 	color: #fff;
+}
+
+.filter-box {
+	margin-top: 15px;
+	background: #f8f9fa;
+	padding: 15px;
+	border-radius: 8px;
+	border: 1px solid #eee;
+	display: inline-block;
 }
 
 .no-data-box {
@@ -78,7 +91,7 @@ th {
 
 .chart-container {
 	position: relative;
-	height: 300px;
+	height: 320px;
 	width: 100%;
 	margin-top: 20px;
 }
@@ -92,17 +105,33 @@ th {
 			</form>
 		</div>
 
-		<h1>商品ランキング</h1>
+		<h1>ランキング分析</h1>
 
-		<div class="filter-links">
-			<a href="RankingServlet?period=day"
-				class="${currentPeriod == 'day' ? 'active' : ''}">本日</a> <a
-				href="RankingServlet?period=week"
-				class="${currentPeriod == 'week' ? 'active' : ''}">1週間</a> <a
-				href="RankingServlet?period=month"
-				class="${currentPeriod == 'month' ? 'active' : ''}">1ヶ月</a> <a
-				href="RankingServlet?period=year"
-				class="${currentPeriod == 'year' ? 'active' : ''}">1年</a>
+		<div class="filter-area">
+			<form action="RankingServlet" method="get">
+				<div class="filter-links">
+					<a href="RankingServlet?period=day&filterType=${selectedFilter}"
+						class="${currentPeriod == 'day' ? 'active' : ''}">本日</a> <a
+						href="RankingServlet?period=week&filterType=${selectedFilter}"
+						class="${currentPeriod == 'week' ? 'active' : ''}">1週間</a> <a
+						href="RankingServlet?period=month&filterType=${selectedFilter}"
+						class="${currentPeriod == 'month' ? 'active' : ''}">1ヶ月</a> <a
+						href="RankingServlet?period=year&filterType=${selectedFilter}"
+						class="${currentPeriod == 'year' ? 'active' : ''}">1年</a>
+				</div>
+
+				<input type="hidden" name="period" value="${currentPeriod}">
+				<div class="filter-box">
+					<strong>集計対象：</strong> <select name="filterType"
+						onchange="this.form.submit()"
+						style="padding: 5px 10px; cursor: pointer;">
+						<option value="all" ${selectedFilter == 'all' ? 'selected' : ''}>商品（セット含む）</option>
+						<option value="item" ${selectedFilter == 'item' ? 'selected' : ''}>商品のみ</option>
+						<option value="option"
+							${selectedFilter == 'option' ? 'selected' : ''}>オプションのみ</option>
+					</select>
+				</div>
+			</form>
 		</div>
 
 		<c:choose>
@@ -111,12 +140,11 @@ th {
 					<p>
 						<strong>${periodLabel}のデータは見つかりませんでした。</strong>
 					</p>
-					<p style="font-size: 0.9em;">※過去のデータを確認するには「1ヶ月」や「1年」を選択してください。</p>
 				</div>
 			</c:when>
 			<c:otherwise>
-				<p>
-					集計期間内の総注文数: <strong>${totalCount}</strong> 点
+				<p>${periodLabel}の総
+					${selectedFilter == 'option' ? 'オプション' : '注文'} 数: <strong>${totalCount}</strong>
 				</p>
 				<div class="chart-container">
 					<canvas id="rankingChart"></canvas>
@@ -125,7 +153,7 @@ th {
 					<thead>
 						<tr>
 							<th>順位</th>
-							<th>商品名</th>
+							<th>${selectedFilter == 'option' ? 'オプション名' : '商品名'}</th>
 							<th>注文数</th>
 							<th>比率</th>
 						</tr>
@@ -161,7 +189,7 @@ th {
                     datasets: [{
                         label: '注文数',
                         data: rankingData.map(d => d.count),
-                        backgroundColor: '#3498db',
+                        backgroundColor: '${selectedFilter == 'option' ? '#e67e22' : '#3498db'}',
                         borderRadius: 5
                     }]
                 },

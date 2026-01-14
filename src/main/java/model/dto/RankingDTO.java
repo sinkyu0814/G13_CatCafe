@@ -3,7 +3,8 @@ package model.dto;
 import java.io.Serializable;
 
 public class RankingDTO implements Serializable {
-	private String goodsName;
+	private static final long serialVersionUID = 1L;
+	private String goodsName; // 商品名またはオプション名が入ります
 	private int orderCount;
 	private double ratio;
 

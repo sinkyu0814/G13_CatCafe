@@ -89,7 +89,9 @@ body {
 
 	<div class="button-grid">
 		<button disabled>勤怠画面</button>
-		<button disabled>売上閲覧</button>
+		<form action="SalesServlet" method="get">
+			<input type="submit" value="売上管理">
+		</form>
 		<button disabled>W/S登録</button>
 
 		<form action="AddMenuServlet" method="get">
