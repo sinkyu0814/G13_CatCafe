@@ -6,155 +6,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>shinkyu13-check</title>
-<style>
-body {
-	font-family: sans-serif;
-	margin: 0;
-	padding: 20px;
-	background-color: #f8f8f8;
-}
-
-.page-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	border-bottom: 2px solid #ccc;
-	margin-bottom: 20px;
-}
-
-.main-content {
-	display: flex;
-	gap: 30px;
-}
-
-.scrollable-area {
-	flex-grow: 1;
-	max-height: 500px;
-	overflow-y: auto;
-	background-color: #fff;
-	border: 1px solid #ddd;
-}
-
-.item-list-table {
-	width: 100%;
-	border-collapse: collapse;
-}
-
-.item-list-table th, .item-list-table td {
-	padding: 12px;
-	text-align: left;
-	border-bottom: 1px solid #eee;
-}
-
-.summary-container {
-	width: 300px;
-	display: flex;
-	flex-direction: column;
-	gap: 20px;
-}
-
-.total-price-box {
-	padding: 20px;
-	background-color: #FFFACD;
-	border: 2px solid #FFD700;
-	align-items: flex-end;
-	display: flex;
-	flex-direction: column;
-}
-
-.total-price-value {
-	font-size: 36px;
-	font-weight: 900;
-	color: #D30000;
-}
-
-.complete-button {
-	width: 100%;
-	padding: 15px 0;
-	background-color: #28a745;
-	color: white;
-	border: none;
-	font-size: 20px;
-	font-weight: bold;
-	cursor: pointer;
-}
-
-.action-buttons {
-	margin-top: auto;
-	width: 100%;
-}
-</style>
+<title>会計確認</title>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/check.css">
 </head>
 <body>
 
-	<header class="page-header">
-		<h1>会計確認（テーブル ${tableNo}）</h1>
+	<div class="container">
+		<header class="page-header">
+			<h1>
+				会計確認 <span class="table-no">（テーブル: ${tableNo}）</span>
+			</h1>
 
-		<%-- HistoryServlet（orderId基準）へ戻る --%>
-		<form action="HistoryServlet" method="GET" style="margin: 0;">
-			<input type="hidden" name="orderId" value="${orderId}">
-			<button type="submit">戻る</button>
-		</form>
-	</header>
+			<%-- 前の履歴画面へ戻る --%>
+			<form action="HistoryServlet" method="GET" class="header-form">
+				<input type="hidden" name="orderId" value="${orderId}">
+				<button type="submit" class="back-link-button">注文履歴へ戻る</button>
+			</form>
+		</header>
 
-	<div class="main-content">
-
-		<div class="scrollable-area">
-			<table class="item-list-table">
-				<thead>
-					<tr>
-						<th style="width: 15%;">画像</th>
-						<th style="width: 45%;">商品名</th>
-						<th style="width: 20%;">値段</th>
-						<th style="width: 20%;">注文数</th>
-					</tr>
-				</thead>
-				<tbody>
-					<c:forEach var="item" items="${items}">
+		<div class="main-content">
+			<div class="scrollable-area">
+				<table class="item-list-table">
+					<thead>
 						<tr>
-							<td><c:if test="${not empty item.image}">
-									<img src="assets/images/${item.image}" width="60" height="60"
-										style="object-fit: cover;">
-								</c:if> <c:if test="${empty item.image}">No Image</c:if></td>
-							<td><strong>${item.name}</strong>
-								<ul
-									style="list-style: none; padding: 0; margin: 5px 0 0 10px; font-size: 0.9em; color: #555;">
-									<c:forEach var="opt" items="${item.selectedOptions}">
-										<li>・${opt.optionName} (+${opt.optionPrice}円)</li>
-									</c:forEach>
-								</ul></td>
-							<td>${item.price}円 <c:if
-									test="${not empty item.selectedOptions}">
-									<div style="font-size: 0.8em; color: #999;">小計:
-										${item.price + item.optionTotalPrice}円</div>
-								</c:if>
-							</td>
-							<td>${item.quantity}個</td>
+							<th>商品</th>
+							<th>商品名・オプション</th>
+							<th>単価</th>
+							<th>数量</th>
 						</tr>
-					</c:forEach>
+					</thead>
+					<tbody>
+						<c:forEach var="item" items="${items}">
+							<tr>
+								<td class="td-img"><c:choose>
+										<c:when test="${not empty item.image}">
+											<img
+												src="${pageContext.request.contextPath}/assets/images/${item.image}"
+												class="checkout-img">
+										</c:when>
+										<c:otherwise>
+											<div class="no-img">No Image</div>
+										</c:otherwise>
+									</c:choose></td>
+								<td class="td-details"><strong class="item-name">${item.name}</strong>
+									<ul class="option-list">
+										<c:forEach var="opt" items="${item.selectedOptions}">
+											<li>・${opt.optionName} (+${opt.optionPrice}円)</li>
+										</c:forEach>
+									</ul></td>
+								<td class="td-price">
+									<div class="base-price">${item.price}円</div> <c:if
+										test="${not empty item.selectedOptions}">
+										<div class="sub-total-text">小計: ${item.price + item.optionTotalPrice}円</div>
+									</c:if>
+								</td>
+								<td class="td-qty">${item.quantity}個</td>
+							</tr>
+						</c:forEach>
 
-					<c:if test="${empty items}">
-						<tr>
-							<td colspan="4" style="text-align: center;">注文はありません。</td>
-						</tr>
-					</c:if>
-				</tbody>
-			</table>
-		</div>
-
-		<div class="summary-container">
-			<div class="total-price-box">
-				<span class="total-price-label">合計金額</span> <span
-					class="total-price-value">${totalAmount}円</span>
+						<c:if test="${empty items}">
+							<tr>
+								<td colspan="4" class="empty-msg">注文内容が見つかりません。</td>
+							</tr>
+						</c:if>
+					</tbody>
+				</table>
 			</div>
 
-			<form action="CheckoutServlet" method="POST" class="action-buttons">
-				<input type="hidden" name="orderId" value="${orderId}">
-				<button type="submit" class="complete-button">会計確定</button>
-			</form>
-		</div>
+			<aside class="summary-container">
+				<div class="final-info-box">
+					<p>
+						上記の内容で<br>会計を確定しますか？
+					</p>
+				</div>
 
+				<div class="total-price-box">
+					<span class="total-price-label">お支払い合計</span> <span
+						class="total-price-value">${totalAmount}円</span> <span
+						class="tax-label">(税込)</span>
+				</div>
+
+				<form action="CheckoutServlet" method="POST" class="action-buttons">
+					<input type="hidden" name="orderId" value="${orderId}">
+					<button type="submit" class="complete-button">会計を確定する</button>
+				</form>
+			</aside>
+		</div>
 	</div>
 
 </body>

@@ -6,52 +6,61 @@
 <head>
 <meta charset="UTF-8">
 <title>注文内容確認</title>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/confirm.css">
 </head>
 <body>
 
-	<h2>商品確認</h2>
+	<div class="container">
+		<h2 class="page-title">商品確認</h2>
 
-	<div style="display: flex; gap: 30px;">
+		<div class="content-wrapper">
 
-		<div>
-			<img src="assets/images/${menu.img}" width="300">
-		</div>
+			<div class="product-image-area">
+				<img
+					src="${pageContext.request.contextPath}/assets/images/${menu.img}"
+					alt="${menu.name}">
+			</div>
 
-		<div>
-			<h3>${menu.name}</h3>
-			<p>価格：${menu.price}円</p>
-			<p>カテゴリ：${menu.category}</p>
+			<div class="product-details-area">
+				<h3 class="product-name">${menu.name}</h3>
+				<p class="product-price">
+					価格：<span>${menu.price}</span>円
+				</p>
+				<p class="product-category">カテゴリ：${menu.category}</p>
 
-			<form action="CartAddServlet" method="post">
-				<input type="hidden" name="id" value="${menu.id}"> <label>数量：</label>
-				<select name="quantity">
-					<c:forEach var="i" begin="1" end="10">
-						<option value="${i}">${i}</option>
-					</c:forEach>
-				</select> <br> <br>
+				<form action="CartAddServlet" method="post" class="add-to-cart-form">
+					<input type="hidden" name="id" value="${menu.id}">
 
-				<c:if test="${not empty options}">
-					<h4>オプション（トッピング）</h4>
-					<div
-						style="background: #f9f9f9; padding: 10px; border-radius: 5px;">
-						<c:forEach var="opt" items="${options}">
-							<label
-								style="display: block; margin-bottom: 5px; cursor: pointer;">
-								<input type="checkbox" name="optionIds" value="${opt.optionId}">
-								${opt.optionName}（+${opt.optionPrice}円）
-							</label>
-						</c:forEach>
+					<div class="quantity-selector">
+						<label for="quantity">数量：</label> <select name="quantity"
+							id="quantity">
+							<c:forEach var="i" begin="1" end="10">
+								<option value="${i}">${i}</option>
+							</c:forEach>
+						</select>
 					</div>
-					<br>
-				</c:if>
 
-				<button type="submit">カートに追加する</button>
-			</form>
+					<c:if test="${not empty options}">
+						<h4 class="option-title">オプション（トッピング）</h4>
+						<div class="options-list">
+							<c:forEach var="opt" items="${options}">
+								<label class="option-item"> <input type="checkbox"
+									name="optionIds" value="${opt.optionId}"> <span
+									class="option-name">${opt.optionName}</span> <span
+									class="option-price">（+${opt.optionPrice}円）</span>
+								</label>
+							</c:forEach>
+						</div>
+					</c:if>
 
-			<br>
-			<form action="ListServlet" method="get">
-				<button type="submit">戻る</button>
-			</form>
+					<button type="submit" class="add-to-cart-button">カートに追加する</button>
+				</form>
+
+				<form action="ListServlet" method="get" class="back-form">
+					<button type="submit" class="back-button">戻る</button>
+				</form>
+			</div>
 		</div>
 	</div>
 

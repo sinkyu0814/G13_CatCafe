@@ -1,0 +1,124 @@
+@charset "UTF-8";
+
+:root {
+	--main-brown: #5D4037;
+	--accent-orange: #E64A19;
+	--background-cream: #FFFDE7;
+	--text-dark: #3E2723;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	font-family: "Hiragino Sans", "Meiryo", sans-serif;
+	background-color: var(--main-brown);
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.container {
+	background-color: var(--background-cream);
+	width: 85vw;
+	height: 80vh;
+	border-radius: 20px;
+	display: flex;
+	flex-direction: column;
+	padding: 40px;
+	box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+	text-align: center;
+}
+
+.header-area {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-bottom: 2px solid var(--accent-orange);
+	padding-bottom: 15px;
+}
+
+.shop-name {
+	font-size: 24px;
+	font-weight: bold;
+	color: var(--main-brown);
+}
+
+.close-button {
+	background-color: var(--main-brown);
+	color: white;
+	border: none;
+	padding: 10px 25px;
+	border-radius: 20px;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.main-message {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.icon-check {
+	font-size: 60px;
+	color: var(--accent-orange);
+	margin-bottom: 20px;
+}
+
+.thank-you {
+	font-size: 32px;
+	color: var(--main-brown);
+	margin: 0 0 40px 0;
+}
+
+.table-info {
+	margin-bottom: 40px;
+}
+
+.table-label {
+	font-size: 18px;
+	margin-bottom: 10px;
+}
+
+.table-number-box {
+	display: inline-block;
+	background-color: white;
+	font-size: 64px;
+	font-weight: 900;
+	color: var(--accent-orange);
+	padding: 10px 40px;
+	border: 4px solid var(--main-brown);
+	border-radius: 15px;
+	line-height: 1;
+}
+
+.table-number-line {
+	font-size: 24px;
+	font-weight: bold;
+}
+
+.instruction-box {
+	background: white;
+	padding: 20px 40px;
+	border-radius: 15px;
+	border: 1px dashed var(--main-brown);
+}
+
+.instruction {
+	font-size: 22px;
+	margin: 0 0 10px 0;
+	font-weight: bold;
+}
+
+.instruction span {
+	color: var(--accent-orange);
+}
+
+.sub-instruction {
+	font-size: 16px;
+	color: #666;
+	margin: 0;
+}

@@ -7,186 +7,89 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>注文履歴</title>
-
-<style type="text/css">
-/* 元のスタイルそのまま */
-body {
-	font-family: sans-serif;
-	margin: 0;
-	padding: 20px;
-	background-color: #f0f0f0;
-}
-
-.page-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 10px 0;
-	border-bottom: 1px solid #ccc;
-	margin-bottom: 20px;
-}
-
-.main-content {
-	display: flex;
-	gap: 20px;
-}
-
-.scrollable-area {
-	flex-grow: 1;
-	max-height: 450px;
-	overflow-y: auto;
-	padding-right: 15px;
-}
-
-.item-list-table {
-	width: 100%;
-	border-collapse: collapse;
-}
-
-.item-list-table th, .item-list-table td {
-	padding: 10px;
-	text-align: left;
-	border-bottom: 1px solid #ddd;
-}
-
-.item-list-table thead tr {
-	background-color: #ccc;
-}
-
-.summary-container {
-	width: 300px;
-	display: flex;
-	flex-direction: column;
-	gap: 15px;
-}
-
-.nutrition-summary-box {
-	flex-grow: 1;
-	min-height: 150px;
-	padding: 10px;
-	background-color: #eee;
-	border: 1px solid #ccc;
-}
-
-.total-price-box {
-	height: 60px;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-around;
-	align-items: flex-end;
-	padding: 10px;
-	background-color: #eee;
-	border: 1px solid #ccc;
-}
-
-.total-price-value {
-	font-size: 18px;
-	font-weight: bold;
-}
-
-.action-buttons {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-	margin-top: auto;
-}
-
-.checkout-button {
-	display: block;
-	padding: 10px 0;
-	background-color: #eee;
-	border: 1px solid #ccc;
-	cursor: pointer;
-	font-size: 16px;
-	text-align: center;
-	width: 100%;
-}
-</style>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/history.css">
 </head>
 
 <body>
 
-	<header class="page-header">
-		<h1>注文履歴（テーブル ${tableNo} ／ 注文ID ${orderId}）</h1>
-		<button onclick="location.href='ListServlet'">閉じる</button>
-	</header>
+	<div class="container">
+		<header class="page-header">
+			<h1>
+				注文履歴 <span class="header-info">（テーブル: ${tableNo} ／ 注文ID:
+					${orderId}）</span>
+			</h1>
+			<button class="close-button" onclick="location.href='ListServlet'">戻る</button>
+		</header>
 
-	<div class="main-content">
-
-		<!-- ===== 注文一覧 ===== -->
-		<div class="scrollable-area">
-			<table class="item-list-table">
-				<thead>
-					<tr>
-						<th style="width: 15%;">画像</th>
-						<th style="width: 45%;">商品名</th>
-						<th style="width: 20%;">値段</th>
-						<th style="width: 20%;">注文数</th>
-					</tr>
-				</thead>
-
-				<tbody>
-					<c:forEach var="item" items="${orderItems}">
+		<div class="main-content">
+			<div class="scrollable-area">
+				<table class="item-list-table">
+					<thead>
 						<tr>
-            <td>
-                <c:choose>
-                    <c:when test="${not empty item.image}">
-                        <img src="${pageContext.request.contextPath}/assets/images/${item.image}" width="50" height="50" style="object-fit: cover;">
-                    </c:when>
-                    <c:otherwise>No Image</c:otherwise>
-                </c:choose>
-            </td>
-            <td>
-                <div>${item.name}</div>
-                <c:forEach var="opt" items="${item.selectedOptions}">
-                    <div style="font-size: 0.8em; color: #666; margin-left: 10px;">
-                        + ${opt.optionName} (+${opt.optionPrice}円)
-                    </div>
-                </c:forEach>
-            </td>
-            <td>
-                ${item.price}円
-                <c:if test="${not empty item.selectedOptions}">
-									<div style="font-size: 0.8em; color: #888;">(計:
-										${item.price + item.optionTotalPrice}円)</div>
-								</c:if>
-							</td>
-            <td>${item.quantity}個</td>
-        </tr>
-					</c:forEach>
-
-					<c:if test="${empty orderItems}">
-						<tr>
-							<td colspan="4">注文履歴がありません</td>
+							<th>商品</th>
+							<th>詳細</th>
+							<th>単価</th>
+							<th>数量</th>
 						</tr>
-					</c:if>
-				</tbody>
-			</table>
-		</div>
-
-		<!-- ===== サマリー ===== -->
-		<div class="summary-container">
-
-			<div class="nutrition-summary-box">
-				<span class="summary-label">栄養素合計（仮）</span>
-				<p>カロリー: ${nutritionData.calories}</p>
-				<p>タンパク質: ${nutritionData.protein}</p>
+					</thead>
+					<tbody>
+						<c:forEach var="item" items="${orderItems}">
+							<tr>
+								<td class="td-img"><c:choose>
+										<c:when test="${not empty item.image}">
+											<img
+												src="${pageContext.request.contextPath}/assets/images/${item.image}"
+												class="history-img">
+										</c:when>
+										<c:otherwise>
+											<div class="no-img">No Image</div>
+										</c:otherwise>
+									</c:choose></td>
+								<td class="td-details">
+									<div class="item-name">${item.name}</div> <c:forEach var="opt"
+										items="${item.selectedOptions}">
+										<div class="option-text">+ ${opt.optionName}
+											(+${opt.optionPrice}円)</div>
+									</c:forEach>
+								</td>
+								<td class="td-price">${item.price}円<c:if
+										test="${not empty item.selectedOptions}">
+										<div class="sub-price">(計: ${item.price + item.optionTotalPrice}円)</div>
+									</c:if>
+								</td>
+								<td class="td-qty">${item.quantity}個</td>
+							</tr>
+						</c:forEach>
+						<c:if test="${empty orderItems}">
+							<tr>
+								<td colspan="4" class="empty-msg">注文履歴がありません</td>
+							</tr>
+						</c:if>
+					</tbody>
+				</table>
 			</div>
 
-			<div class="total-price-box">
-				<span class="summary-label">合計金額</span> <span
-					class="total-price-value">${totalAmount}円</span>
-			</div>
+			<aside class="summary-container">
+				<div class="info-box">
+					<p class="info-text">
+						ご注文ありがとうございます。<br>内容をご確認ください。
+					</p>
+				</div>
 
-			<div class="action-buttons">
-				<button class="call-button">店員呼び出し</button>
+				<div class="total-price-box">
+					<span class="total-label">合計金額（税込）</span> <span
+						class="total-price-value">${totalAmount}円</span>
+				</div>
 
-				<!-- 会計画面へ（orderIdをセッション利用する想定） -->
-				<form action="CheckServlet" method="GET"
-					style="margin: 0; padding: 0; width: 100%;">
-					<button type="submit" class="checkout-button">会計</button>
-				</form>
-			</div>
+				<div class="action-buttons">
+					<button class="call-button">店員を呼ぶ</button>
+
+					<form action="CheckServlet" method="GET" style="width: 100%;">
+						<button type="submit" class="checkout-button">お会計へ進む</button>
+					</form>
+				</div>
+			</aside>
 		</div>
 	</div>
 

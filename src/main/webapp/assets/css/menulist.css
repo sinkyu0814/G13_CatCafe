@@ -1,0 +1,209 @@
+@charset "UTF-8";
+
+/* コメダ風カラーパレット */
+body {
+	margin: 0;
+	padding: 0;
+	font-family: "Hiragino Sans", "Meiryo", sans-serif;
+	background-color: #5D4037;
+	height: 100vh;
+	overflow: hidden;
+	color: #3E2723;
+}
+
+.container {
+	display: flex;
+	height: 100vh;
+	width: 100vw;
+}
+
+/* メインコンテンツ：右側に押しつぶされないよう調整 */
+.main-content {
+	flex: 1;
+	min-width: 0;
+	/* 子要素のスライダーが原因で突き抜けるのを防ぐ */
+	display: flex;
+	flex-direction: column;
+	padding: 20px;
+	background-color: #FFFDE7;
+}
+
+/* カテゴリナビゲーション */
+.category-nav form {
+	display: flex;
+	gap: 8px;
+	width: 100%;
+}
+
+.category-nav button {
+	flex: 1;
+	padding: 15px 5px;
+	background-color: #8D6E63;
+	color: white;
+	border: none;
+	border-radius: 5px 5px 0 0;
+	cursor: pointer;
+	font-weight: bold;
+	font-size: 14px;
+	transition: 0.3s;
+}
+
+.category-nav button.active {
+	background-color: #E64A19;
+}
+
+/* 商品スライダー */
+.product-slider-wrapper {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	position: relative;
+	margin: 15px 0;
+	overflow: hidden;
+}
+
+.product-grid {
+	display: flex;
+	flex: 1;
+	gap: 20px;
+	overflow-x: hidden;
+	scroll-snap-type: x mandatory;
+	height: 95%;
+	align-items: center;
+}
+
+.menu-item {
+	flex: 0 0 calc(33.333% - 14px);
+	scroll-snap-align: start;
+	background-color: white;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	border-radius: 10px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+	overflow: hidden;
+	border: 2px solid #D7CCC8;
+}
+
+.img-container {
+	flex: 1;
+	background-color: #F5F5F5;
+	overflow: hidden;
+}
+
+.img-container img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.item-info {
+	padding: 12px;
+}
+
+.item-name {
+	margin: 0;
+	font-size: 1.1rem;
+	font-weight: bold;
+	color: #5D4037;
+}
+
+.item-price {
+	margin: 5px 0 0 0;
+	text-align: right;
+	font-weight: bold;
+	color: #E64A19;
+	font-size: 1.2rem;
+}
+
+/* 矢印ボタン */
+.slider-arrow {
+	background: rgba(93, 64, 55, 0.8);
+	color: white;
+	border: none;
+	font-size: 30px;
+	padding: 40px 15px;
+	cursor: pointer;
+	z-index: 10;
+	border-radius: 8px;
+	margin: 0 5px;
+	flex-shrink: 0;
+	/* 矢印自体も潰れないように */
+}
+
+/* 会計ボタン */
+.footer-actions {
+	text-align: center;
+	padding: 10px 0;
+}
+
+.checkout-main-button {
+	padding: 15px 120px;
+	font-size: 1.3rem;
+	background-color: #E64A19;
+	color: white;
+	border: none;
+	border-radius: 30px;
+	cursor: pointer;
+	font-weight: bold;
+	box-shadow: 0 4px 0 #BF360C;
+}
+
+/* 右サイドバー：絶対に潰れないように設定 */
+.sidebar {
+	width: 280px;
+	flex-shrink: 0;
+	/* これが重要：左側のコンテンツに押されても縮まない */
+	background-color: #EFEBE9;
+	display: flex;
+	flex-direction: column;
+	padding: 20px;
+	border-left: 3px solid #D7CCC8;
+	box-sizing: border-box;
+	/* パディングを含めて280pxにする */
+}
+
+.cart-header {
+	background-color: #5D4037;
+	color: white;
+	border-radius: 30px;
+	text-align: center;
+	padding: 12px;
+	font-weight: bold;
+	margin-bottom: 20px;
+}
+
+.cart-content {
+	flex: 1;
+	overflow-y: auto;
+}
+
+.cart-row {
+	display: flex;
+	justify-content: space-between;
+	padding: 15px 5px;
+	border-bottom: 1px dashed #BCAAA4;
+}
+
+.sidebar-footer {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin-top: 20px;
+}
+
+.side-btn {
+	width: 100%;
+	padding: 15px;
+	background-color: white;
+	border: 2px solid #8D6E63;
+	color: #5D4037;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.order-btn {
+	background-color: #8D6E63;
+	color: white;
+}
