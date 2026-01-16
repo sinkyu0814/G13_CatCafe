@@ -1,0 +1,170 @@
+@charset "UTF-8";
+
+:root {
+	--main-brown: #5D4037;
+	--accent-orange: #E64A19;
+	--background-cream: #FFFDE7;
+	--text-dark: #3E2723;
+	--border-color: #D7CCC8;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	font-family: "Hiragino Sans", "Meiryo", sans-serif;
+	background-color: var(--main-brown);
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: var(--text-dark);
+}
+
+.container {
+	background-color: var(--background-cream);
+	width: 90vw;
+	max-width: 800px;
+	padding: 40px;
+	border-radius: 20px;
+	box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+.welcome-header {
+	text-align: center;
+	margin-bottom: 30px;
+}
+
+.shop-name {
+	font-size: 2.5rem;
+	color: var(--main-brown);
+	margin: 0;
+	font-weight: 900;
+}
+
+.welcome-msg {
+	font-size: 1.2rem;
+	margin-top: 10px;
+	line-height: 1.5;
+}
+
+.input-form {
+	display: flex;
+	gap: 40px;
+	align-items: flex-start;
+}
+
+/* 入力表示エリア */
+.input-area {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 25px;
+}
+
+.input-group label {
+	display: block;
+	font-weight: bold;
+	margin-bottom: 10px;
+	font-size: 1.1rem;
+}
+
+.field-wrapper {
+	display: flex;
+	align-items: baseline;
+	background: white;
+	padding: 10px 20px;
+	border: 3px solid var(--border-color);
+	border-radius: 10px;
+}
+
+.field-wrapper input {
+	border: none;
+	font-size: 2.5rem;
+	width: 100%;
+	text-align: right;
+	color: var(--main-brown);
+	font-weight: bold;
+	background: transparent;
+	outline: none;
+}
+
+.active-field {
+	border-color: var(--accent-orange) !important;
+	background-color: #FFF9C4 !important;
+	/* 選択中を分かりやすく */
+}
+
+.unit {
+	font-size: 1.2rem;
+	margin-left: 10px;
+	font-weight: bold;
+}
+
+/* キーパッド */
+.keypad-container {
+	width: 300px;
+}
+
+.keypad {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 15px;
+	margin-bottom: 25px;
+}
+
+.keypad button {
+	height: 80px;
+	font-size: 1.8rem;
+	font-weight: bold;
+	background-color: white;
+	border: 2px solid var(--main-brown);
+	border-radius: 10px;
+	color: var(--main-brown);
+	cursor: pointer;
+	box-shadow: 0 4px 0 var(--border-color);
+	transition: 0.1s;
+}
+
+.keypad button:active {
+	transform: translateY(3px);
+	box-shadow: 0 1px 0 var(--border-color);
+}
+
+.btn-clear {
+	color: #D32F2F !important;
+}
+
+.btn-back {
+	font-size: 1.4rem !important;
+}
+
+/* 決定ボタン */
+.start-button {
+	width: 100%;
+	padding: 20px;
+	background-color: var(--accent-orange);
+	color: white;
+	border: none;
+	border-radius: 40px;
+	font-size: 1.5rem;
+	font-weight: bold;
+	cursor: pointer;
+	box-shadow: 0 6px 0 #BF360C;
+}
+
+.start-button:active {
+	transform: translateY(3px);
+	box-shadow: 0 3px 0 #BF360C;
+}
+
+/* エラーメッセージ */
+.error-banner {
+	margin-top: 25px;
+	background-color: #FFEBEE;
+	color: #C62828;
+	padding: 15px;
+	border-radius: 10px;
+	text-align: center;
+	font-weight: bold;
+	border: 1px solid #EF9A9A;
+}
