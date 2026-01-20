@@ -1,0 +1,69 @@
+/* TableSelect.jsp 専用スタイル */
+body {
+	font-family: "Helvetica Neue", Arial, sans-serif;
+	background-color: #f4f7f6;
+}
+
+.container-center {
+	width: 800px;
+	margin: auto;
+}
+
+.table-layout {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 10px;
+	width: 800px;
+	margin: 50px auto;
+}
+
+.table-unit {
+	background-color: #e0e0e0;
+	padding: 20px;
+	text-align: center;
+	cursor: pointer;
+	border: 2px solid transparent;
+	font-size: 1.2em;
+	transition: background-color 0.2s;
+}
+
+.table-unit:hover {
+	background-color: #d0d0d0;
+}
+
+.table-unit.selected {
+	border: 2px solid #3498db;
+	background-color: #c0e0f0;
+}
+
+.status {
+	margin-top: 5px;
+	font-size: 0.9em;
+	color: #333;
+}
+
+.btn-container {
+	text-align: center;
+	margin-top: 20px;
+}
+
+button {
+	padding: 10px 20px;
+	margin: 5px;
+	cursor: pointer;
+}
+
+.admin-section {
+	text-align: center;
+	margin-top: 30px;
+	padding: 20px;
+	border-top: 1px dashed #ccc;
+}
+
+.btn-reset {
+	background-color: #e74c3c;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 5px;
+}

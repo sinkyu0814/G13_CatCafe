@@ -32,7 +32,7 @@
 				<div class="product-grid" id="productGrid">
 					<c:forEach var="m" items="${menuList}">
 						<div class="menu-item">
-							<a href="ConfirmServlet?id=${m.id}">
+							<a href="ConfirmServlet?id=${m.id}&category=${param.category}">
 								<div class="img-container">
 									<img
 										src="${pageContext.request.contextPath}/assets/images/${m.img}"
@@ -63,10 +63,42 @@
 
 			<div class="cart-content">
 				<c:if test="${not empty cart}">
-					<c:forEach var="c" items="${cart}">
-						<div class="cart-row">
-							<span class="cart-item-name">${c.goodsName}</span> <span
-								class="cart-item-qty">× ${c.quantity}</span>
+					<c:forEach var="c" items="${cart}" varStatus="status">
+						<div class="cart-row"
+							style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+							<div class="cart-info">
+								<span class="cart-item-name">${c.goodsName}</span>
+								<c:if test="${not empty c.selectedOptions}">
+									<div style="font-size: 0.75em; color: #666;">
+										<c:forEach var="opt" items="${c.selectedOptions}">
+											+${opt.optionName}
+										</c:forEach>
+									</div>
+								</c:if>
+							</div>
+
+							<div class="cart-qty-area"
+								style="display: flex; align-items: center; gap: 5px;">
+								<form action="UpdateCartServlet" method="post"
+									style="margin: 0;">
+									<input type="hidden" name="index" value="${status.index}">
+									<input type="hidden" name="change" value="-1"> <input
+										type="hidden" name="category" value="${param.category}">
+									<button type="submit" class="qty-btn"
+										style="width: 24px; height: 24px; padding: 0;">-</button>
+								</form>
+
+								<span class="cart-item-qty">${c.quantity}</span>
+
+								<form action="UpdateCartServlet" method="post"
+									style="margin: 0;">
+									<input type="hidden" name="index" value="${status.index}">
+									<input type="hidden" name="change" value="1"> <input
+										type="hidden" name="category" value="${param.category}">
+									<button type="submit" class="qty-btn"
+										style="width: 24px; height: 24px; padding: 0;">+</button>
+								</form>
+							</div>
 						</div>
 					</c:forEach>
 				</c:if>

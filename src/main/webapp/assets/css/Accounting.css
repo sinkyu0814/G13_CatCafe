@@ -1,0 +1,51 @@
+/* Accounting.jsp 専用スタイル */
+body {
+	font-family: Arial, sans-serif;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.grid-container {
+	display: grid;
+	grid-template-columns: 2fr 1fr;
+	width: 800px;
+	gap: 20px;
+	margin-top: 20px;
+}
+
+.order-panel,
+.accounting-panel {
+	border: 1px solid #ccc;
+	padding: 15px;
+}
+
+.keypad {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 5px;
+	margin-top: 10px;
+}
+
+.keypad button,
+#depositInput {
+	padding: 10px;
+	font-size: 1.2em;
+}
+
+.amount-info div {
+	margin-bottom: 10px;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-bottom: 20px;
+}
+
+th,
+td {
+	border: 1px solid #ddd;
+	padding: 8px;
+	text-align: left;
+}

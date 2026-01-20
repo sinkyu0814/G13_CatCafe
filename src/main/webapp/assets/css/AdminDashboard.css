@@ -1,0 +1,70 @@
+/* AdminDashboard.jsp 専用スタイル */
+body {
+	font-family: "Helvetica Neue", Arial, sans-serif;
+	text-align: center;
+	margin: 0;
+	padding: 20px;
+	background-color: #ffffff;
+}
+
+/* 時計部分のコンテナ */
+.clock-outer-container {
+	border: 2px solid #3498db;
+	padding: 40px;
+	margin: 20px auto;
+	width: 90%;
+	max-width: 800px;
+	text-align: left;
+}
+
+.home-label {
+	background-color: #ccc;
+	padding: 2px 10px;
+	font-size: 14px;
+	border: 1px solid #999;
+}
+
+/* デジタル時計ボックス */
+.clock-box {
+	background-color: #dcdcdc;
+	display: inline-block;
+	padding: 20px 40px;
+	margin-top: 20px;
+	font-size: 80px;
+	font-family: "Courier New", Courier, monospace;
+	letter-spacing: 15px;
+	font-weight: bold;
+	color: #000;
+	min-width: 250px;
+	text-align: center;
+}
+
+.quote-text {
+	font-size: 32px;
+	margin: 40px 0;
+}
+
+/* ボタンのレイアウト */
+.button-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 220px);
+	gap: 20px;
+	justify-content: center;
+	margin-bottom: 40px;
+}
+
+.button-grid button,
+.button-grid input[type="submit"] {
+	width: 100%;
+	padding: 15px;
+	font-size: 18px;
+	background-color: #dcdcdc;
+	border: 1px solid #bbb;
+	cursor: pointer;
+	color: #333;
+}
+
+.button-grid button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}

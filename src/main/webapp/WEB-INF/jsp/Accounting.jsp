@@ -3,69 +3,21 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <title>個別会計画面</title>
-
-<style>
-body {
-	font-family: Arial, sans-serif;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-.grid-container {
-	display: grid;
-	grid-template-columns: 2fr 1fr;
-	width: 800px;
-	gap: 20px;
-	margin-top: 20px;
-}
-
-.order-panel, .accounting-panel {
-	border: 1px solid #ccc;
-	padding: 15px;
-}
-
-.keypad {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 5px;
-	margin-top: 10px;
-}
-
-.keypad button, #depositInput {
-	padding: 10px;
-	font-size: 1.2em;
-}
-
-.amount-info div {
-	margin-bottom: 10px;
-}
-
-table {
-	width: 100%;
-	border-collapse: collapse;
-	margin-bottom: 20px;
-}
-
-th, td {
-	border: 1px solid #ddd;
-	padding: 8px;
-	text-align: left;
-}
-</style>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/Accounting.css">
 </head>
 
 <body>
 
 	<%
-	Integer orderId = (Integer) request.getAttribute("orderId");
-	Integer tableNo = (Integer) request.getAttribute("tableNo");
-	List<OrderItem> orderList = (List<OrderItem>) request.getAttribute("orderList");
-	Integer totalAmount = (Integer) request.getAttribute("totalAmount");
-	if (totalAmount == null)
-		totalAmount = 0;
-	%>
+    Integer orderId = (Integer) request.getAttribute("orderId");
+    Integer tableNo = (Integer) request.getAttribute("tableNo");
+    List<OrderItem> orderList = (List<OrderItem>) request.getAttribute("orderList");
+    Integer totalAmount = (Integer) request.getAttribute("totalAmount");
+    if (totalAmount == null) totalAmount = 0;
+    %>
 
 	<h1>個別会計画面</h1>
 
@@ -77,7 +29,6 @@ th, td {
 			<%=orderId%>）
 		</h2>
 
-		<!-- 注文履歴へ戻る -->
 		<form action="TableSelectServlet" method="GET">
 			<input type="hidden" name="orderId" value="<%=orderId%>">
 			<button type="submit">戻る</button>
@@ -86,7 +37,6 @@ th, td {
 
 	<div class="grid-container">
 
-		<!-- 注文内容 -->
 		<div class="order-panel">
 			<h3>
 				合計金額: <span id="totalAmountDisplay"><%=totalAmount%></span> 円
@@ -102,13 +52,10 @@ th, td {
 					</tr>
 				</thead>
 				<tbody>
-					<%
-            if (orderList != null && !orderList.isEmpty()) {
-                for (OrderItem item : orderList) {
-            %>
+					<% if (orderList != null && !orderList.isEmpty()) {
+                        for (OrderItem item : orderList) { %>
 					<tr>
-						<td><strong><%=item.getName()%></strong> <%-- ★ オプションの表示ループを追加 --%>
-							<% if (item.getSelectedOptions() != null && !item.getSelectedOptions().isEmpty()) { %>
+						<td><strong><%=item.getName()%></strong> <% if (item.getSelectedOptions() != null && !item.getSelectedOptions().isEmpty()) { %>
 							<ul
 								style="list-style: none; padding: 0; margin: 5px 0 0 10px; font-size: 0.85em; color: #666;">
 								<% for (model.dto.MenuOptionDTO opt : item.getSelectedOptions()) { %>
@@ -124,10 +71,7 @@ th, td {
 								円)
 							</div> <% } %></td>
 					</tr>
-					<%
-                }
-            } else {
-            %>
+					<% } } else { %>
 					<tr>
 						<td colspan="3">注文がありません</td>
 					</tr>
@@ -136,9 +80,7 @@ th, td {
 			</table>
 		</div>
 
-		<!-- 会計操作 -->
 		<div class="accounting-panel">
-
 			<div class="amount-info">
 				<div>
 					預り金: <input type="text" id="depositInput" readonly value="0">
@@ -150,18 +92,13 @@ th, td {
 			</div>
 
 			<div class="keypad">
-				<%
-				for (int i = 1; i <= 9; i++) {
-				%>
+				<% for (int i = 1; i <= 9; i++) { %>
 				<button type="button" onclick="inputNumber(<%=i%>)"><%=i%></button>
-				<%
-				}
-				%>
+				<% } %>
 				<button type="button" onclick="inputNumber(0)">0</button>
 				<button type="button" onclick="clearInput()">×</button>
 			</div>
 
-			<!-- 会計確定 -->
 			<form id="finishAccountingForm" action="AccountingServlet"
 				method="POST">
 				<input type="hidden" name="orderId" value="<%=orderId%>"> <input
@@ -172,61 +109,10 @@ th, td {
 					onclick="submitFinishAccounting()"
 					style="width: 100%; margin-top: 10px;">会計終了</button>
 			</form>
-
 		</div>
 	</div>
 
-	<script>
-const depositInput = document.getElementById('depositInput');
-const changeDisplay = document.getElementById('changeDisplay');
-const totalAmountValue = parseInt(document.getElementById('totalAmountValue').value);
-const finishButton = document.getElementById('finishButton');
-
-function calculateChange() {
-	const deposit = parseInt(depositInput.value) || 0;
-	const change = deposit - totalAmountValue;
-
-	if (change >= 0) {
-		changeDisplay.textContent = change.toLocaleString();
-		finishButton.disabled = (totalAmountValue === 0);
-	} else {
-		changeDisplay.textContent = '金額不足';
-		finishButton.disabled = true;
-	}
-}
-
-function inputNumber(num) {
-	let current = depositInput.value === '0' ? '' : depositInput.value;
-	if (current.length < 9) {
-		depositInput.value = current + num;
-	}
-	calculateChange();
-}
-
-function clearInput() {
-	let current = depositInput.value;
-	if (current.length > 1) {
-		depositInput.value = current.slice(0, -1);
-	} else {
-		depositInput.value = '0';
-	}
-	calculateChange();
-}
-
-function submitFinishAccounting() {
-	const deposit = parseInt(depositInput.value) || 0;
-	if (deposit >= totalAmountValue && totalAmountValue > 0) {
-		document.getElementById('hiddenDeposit').value = deposit;
-		document.getElementById('finishAccountingForm').submit();
-	} else if (totalAmountValue === 0) {
-		alert('会計する商品がありません。');
-	} else {
-		alert('預り金が不足しています。');
-	}
-}
-
-calculateChange();
-</script>
-
+	<script
+		src="${pageContext.request.contextPath}/assets/js/Accounting.js"></script>
 </body>
 </html>

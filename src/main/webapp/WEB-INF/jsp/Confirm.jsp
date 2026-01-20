@@ -30,7 +30,8 @@
 				<p class="product-category">カテゴリ：${menu.category}</p>
 
 				<form action="CartAddServlet" method="post" class="add-to-cart-form">
-					<input type="hidden" name="id" value="${menu.id}">
+					<input type="hidden" name="id" value="${menu.id}"> <input
+						type="hidden" name="category" value="${param.category}">
 
 					<div class="quantity-selector">
 						<label for="quantity">数量：</label> <select name="quantity"
@@ -58,6 +59,7 @@
 				</form>
 
 				<form action="ListServlet" method="get" class="back-form">
+					<input type="hidden" name="category" value="${param.category}">
 					<button type="submit" class="back-button">戻る</button>
 				</form>
 			</div>

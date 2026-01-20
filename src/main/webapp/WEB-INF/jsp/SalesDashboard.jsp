@@ -7,173 +7,8 @@
 <head>
 <meta charset="UTF-8">
 <title>売上閲覧システム</title>
-<style>
-/* 全体レイアウト */
-body {
-	font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN",
-		"Hiragino Sans", Meiryo, sans-serif;
-	margin: 0;
-	background: #fff;
-	color: #333;
-}
-
-/* ヘッダーエリア（パンくずとボタンを横並びに） */
-.header-nav {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 15px 25px;
-}
-
-.breadcrumb {
-	border: 1px solid #000;
-	padding: 4px 12px;
-	font-size: 13px;
-	background: #f9f9f9;
-}
-
-/* 戻るボタンの装飾 */
-.nav-btn button {
-	background: #666;
-	color: #fff;
-	border: none;
-	padding: 6px 15px;
-	border-radius: 4px;
-	cursor: pointer;
-	font-size: 13px;
-	transition: 0.2s;
-}
-
-.nav-btn button:hover {
-	background: #333;
-}
-
-.main-wrap {
-	padding: 0 25px;
-}
-
-/* タブデザイン */
-.tabs {
-	display: flex;
-	margin-bottom: -1px;
-	padding-left: 10px;
-}
-
-.tab {
-	padding: 8px 35px;
-	background: #e0e0e0;
-	border: 1px solid #999;
-	text-decoration: none;
-	color: #333;
-	margin-right: 10px;
-	font-size: 14px;
-	border-top-left-radius: 4px;
-	border-top-right-radius: 4px;
-}
-
-.tab.active {
-	background: #cccccc;
-	border-bottom: 1px solid #cccccc;
-	font-weight: bold;
-}
-
-/* レポート表示エリア（灰色背景） */
-.report-bg {
-	background-color: #cccccc;
-	border: 1px solid #999;
-	padding: 25px;
-	min-height: 600px;
-	box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
-}
-
-/* フィルター操作エリア */
-.filter-area {
-	margin-bottom: 20px;
-	display: flex;
-	align-items: center;
-	gap: 15px;
-}
-
-.filter-box {
-	background: #fff;
-	border: 1px solid #999;
-	padding: 5px 15px;
-	display: inline-block;
-	border-radius: 3px;
-}
-
-.filter-box select {
-	border: none;
-	outline: none;
-	font-size: 16px;
-	cursor: pointer;
-	padding: 2px;
-}
-
-.filter-label {
-	font-size: 14px;
-	font-weight: bold;
-}
-
-/* テーブルデザイン */
-.sales-table {
-	width: 100%;
-	border-collapse: collapse;
-	margin-top: 10px;
-}
-
-.sales-table th {
-	border: 1px solid #000;
-	background: #d9d9d9;
-	padding: 10px;
-	font-weight: bold;
-	text-align: center;
-	font-size: 14px;
-}
-
-.sales-table td {
-	border: 1px solid #000;
-	padding: 8px;
-	vertical-align: middle;
-}
-
-/* 数値入力風の白枠デザイン */
-.white-box {
-	background: white;
-	border: 1px solid #999;
-	height: 28px;
-	display: flex;
-	align-items: center;
-	padding: 0 10px;
-	width: 90%;
-	margin: 0 auto;
-	font-size: 15px;
-	font-family: monospace;
-}
-
-.text-right {
-	justify-content: flex-end;
-}
-
-.text-center {
-	justify-content: center;
-}
-
-/* 文字色設定 */
-.zero-data {
-	color: #999 !important;
-}
-
-.sat-color {
-	color: #0000ff !important;
-	font-weight: bold;
-}
-
-.sun-color {
-	color: #ff0000 !important;
-	font-weight: bold;
-}
-</style>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/SalesDashboard.css">
 </head>
 <body>
 	<div class="header-nav">
@@ -202,9 +37,7 @@ body {
 					<span class="filter-label">表示範囲：</span>
 					<div class="filter-box">
 						<c:choose>
-							<c:when test="${currentType == 'year'}">
-								<span>全期間集計</span>
-							</c:when>
+							<c:when test="${currentType == 'year'}">全期間集計</c:when>
 							<c:when test="${currentType == 'month'}">
 								<select name="year" onchange="this.form.submit()">
 									<c:forEach var="y" begin="2020" end="2026">
@@ -273,3 +106,4 @@ body {
 		</div>
 	</div>
 </body>
+</html>
