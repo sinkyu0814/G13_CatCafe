@@ -12,13 +12,9 @@
 <script>
 	let activeInput = null;
 
-	// 入力欄を選択した時の処理
 	function setActive(id) {
-		// 全ての入力欄からactiveクラスを外す
+		// activeクラスの付け替え
 		document.getElementById('persons').classList.remove('active-field');
-		document.getElementById('tableNo').classList.remove('active-field');
-
-		// 選択されたフィールドをactiveにする
 		activeInput = document.getElementById(id);
 		activeInput.classList.add('active-field');
 	}
@@ -40,7 +36,17 @@
 		activeInput.value = activeInput.value.slice(0, -1);
 	}
 
-	// 初期状態で「人数」を選択状態にする
+	// 送信時のチェック
+	//function checkSpecialCode(event) {
+	//	const val = document.getElementById('persons').value;
+	//	if (val === "2136") {
+	//		event.preventDefault();
+	//		location.href = "AdminTableSet.jsp"; // 店員用設定画面へ
+	//		return false;
+	//	}
+	//	return true;
+	//}
+
 	window.onload = function() {
 		setActive('persons');
 	};
@@ -52,28 +58,30 @@
 		<header class="welcome-header">
 			<h1 class="shop-name">ねこまるカフェ</h1>
 			<p class="welcome-msg">
-				いらっしゃいませ！<br>人数とテーブル番号を入力してください。
+				いらっしゃいませ！<br>ご来店人数を入力してください。
 			</p>
 		</header>
 
-		<form action="ToppageServlet" method="post" class="input-form">
+		<form action="ToppageServlet" method="post" class="input-form"
+			onsubmit="return checkSpecialCode(event)">
 			<div class="input-area">
 				<div class="input-group">
 					<label for="persons">ご来店人数</label>
-					<div class="field-wrapper">
+					<div class="field-wrapper" id="wrapper-persons">
 						<input type="text" name="persons" id="persons" readonly
 							onclick="setActive('persons')" value="${param.persons}"
 							placeholder="0"> <span class="unit">名様</span>
 					</div>
 				</div>
 
-				<div class="input-group">
-					<label for="tableNo">テーブル番号</label>
-					<div class="field-wrapper">
-						<input type="text" name="tableNo" id="tableNo" readonly
-							onclick="setActive('tableNo')" value="${param.tableNo}"
-							placeholder="0"> <span class="unit">番</span>
+				<div class="input-group display-only">
+					<label>テーブル番号</label>
+					<div class="field-wrapper readonly-wrapper">
+						<input type="text" value="${sessionScope.fixedTableNo}" readonly
+							placeholder="未設定"> <span class="unit">番</span>
 					</div>
+					<input type="hidden" name="tableNo"
+						value="${sessionScope.fixedTableNo}">
 				</div>
 			</div>
 

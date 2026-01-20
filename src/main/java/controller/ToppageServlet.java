@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
 @WebServlet("/ToppageServlet")
 public class ToppageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -31,35 +32,41 @@ public class ToppageServlet extends HttpServlet {
 		request.setCharacterEncoding("UTF-8");
 
 		String personsStr = request.getParameter("persons");
-		String tableNoStr = request.getParameter("tableNo");
+		HttpSession session = request.getSession();
 
 		int persons;
 		int tableNo;
 
-		// 未入力チェック
-		if (personsStr == null || personsStr.isEmpty()
-				|| tableNoStr == null || tableNoStr.isEmpty()) {
-
-			request.setAttribute("error", "人数とテーブル番号を入力してください");
+		// 1. 未入力チェック
+		if (personsStr == null || personsStr.isEmpty()) {
+			request.setAttribute("error", "人数を入力してください");
 			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp")
 					.forward(request, response);
 			return;
 		}
 
-		// 数値チェック
+		// 2. ★ 特殊コード判定（人数入力欄に 2136 と打たれた場合）
+		if ("2136".equals(personsStr)) {
+			request.getRequestDispatcher("/WEB-INF/jsp/AdminTableSet.jsp")
+					.forward(request, response);
+			return;
+		}
+
+		// 3. ★ セッションから固定テーブル番号を取得
+		String fixedTableNo = (String) session.getAttribute("fixedTableNo");
+		if (fixedTableNo == null || fixedTableNo.isEmpty()) {
+			request.setAttribute("error", "店員を呼んでください（テーブル未設定）");
+			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp")
+					.forward(request, response);
+			return;
+		}
+
+		// 4. 数値チェックと範囲チェック
 		try {
 			persons = Integer.parseInt(personsStr);
-			tableNo = Integer.parseInt(tableNoStr);
+			tableNo = Integer.parseInt(fixedTableNo); // セッションの値を数値に変換
 		} catch (NumberFormatException e) {
 			request.setAttribute("error", "正しい数値を入力してください");
-			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp")
-					.forward(request, response);
-			return;
-		}
-
-		// 範囲チェック
-		if (tableNo < 1 || tableNo > 25) {
-			request.setAttribute("error", "テーブル番号は1～25番です");
 			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp")
 					.forward(request, response);
 			return;
@@ -72,11 +79,11 @@ public class ToppageServlet extends HttpServlet {
 			return;
 		}
 
-		HttpSession session = request.getSession();
+		// セッションに情報をセット
 		session.setAttribute("persons", persons);
 		session.setAttribute("tableNo", tableNo);
 
-		// orders 作成
+		// 5. orders レコード作成
 		try (Connection conn = DBManager.getConnection()) {
 
 			String sql = """
@@ -103,6 +110,7 @@ public class ToppageServlet extends HttpServlet {
 			throw new ServletException(e);
 		}
 
+		// 注文一覧画面へリダイレクト
 		response.sendRedirect("ListServlet");
 	}
 }

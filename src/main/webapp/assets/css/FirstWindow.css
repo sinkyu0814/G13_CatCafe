@@ -168,3 +168,35 @@ body {
 	font-weight: bold;
 	border: 1px solid #EF9A9A;
 }
+
+/* 既存のCSSの最後に追記するか、差し替えてください */
+
+.readonly-wrapper {
+	background-color: #F5F5F5 !important;
+	/* 少しグレーにして入力不可を表現 */
+	border: 2px solid #E0E0E0 !important;
+	opacity: 0.8;
+}
+
+.readonly-wrapper input {
+	color: #9E9E9E !important;
+	/* 文字色を薄く */
+	cursor: default;
+}
+
+/* 入力エリア全体のレイアウト崩れ防止 */
+.input-area {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 30px;
+	/* 項目間の余白 */
+}
+
+/* 特殊コード入力時のフォーカス色 */
+.active-field {
+	border: 3px solid #E64A19 !important;
+	/* コメダオレンジ */
+	background-color: #FFF9C4 !important;
+	/* 薄い黄色 */
+}
