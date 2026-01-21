@@ -7,39 +7,46 @@
 <title>お会計受付完了</title>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/checkout.css">
+<script>
+    // 3秒ごとに会計状態をチェックする関数
+    function checkStatus() {
+        // サーバーに「セッション(orderId)が消えたか」を確認しに行く
+        fetch('${pageContext.request.contextPath}/CheckStatusServlet')
+            .then(response => response.json())
+            .then(data => {
+                if (data.isCleared) {
+                    // 店員が会計を確定（セッションクリア）させていたら、自動でトップページへ
+                    window.location.href = '${pageContext.request.contextPath}/ToppageServlet';
+                }
+            })
+            .catch(error => console.error('状態チェックエラー:', error));
+    }
+
+    // 画面を開いた後、3秒おきにチェックを実行
+    setInterval(checkStatus, 3000);
+</script>
 </head>
 <body>
-
 	<div class="container">
 		<header class="header-area">
 			<div class="shop-name">ねこまるカフェ</div>
-			<div class="close-button-container">
-				<a href="${pageContext.request.contextPath}/ToppageServlet">
-					<button class="close-button">閉じる</button>
-				</a>
-			</div>
 		</header>
 
 		<main class="main-message">
 			<div class="icon-check">✔</div>
 			<h2 class="thank-you">ご利用ありがとうございました</h2>
-
 			<div class="table-info">
 				<p class="table-label">お客様のテーブル番号</p>
 				<div class="table-number-line">
 					<span class="table-number-box">${tableNo}</span> 番
 				</div>
 			</div>
-
 			<div class="instruction-box">
 				<p class="instruction">
-					こちらの画面をそのままに、<br>
-					<span>レジまでお越しください。</span>
+					そのままレジまでお越しください。<br> <span>お会計が完了すると画面が切り替わります。</span>
 				</p>
-				<p class="sub-instruction">伝票（テーブル番号）を確認させていただきます。</p>
 			</div>
 		</main>
 	</div>
-
 </body>
 </html>

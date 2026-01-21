@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.dto.MenuOptionDTO;
 import viewmodel.OrderItem;
+
 @WebServlet("/AccountingServlet")
 public class AccountingServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -40,8 +41,6 @@ public class AccountingServlet extends HttpServlet {
 		int tableNo = 0;
 
 		try (Connection conn = DBManager.getConnection()) {
-
-			// ★ オプション情報を取得するSQLに修正
 			String sql = """
 					SELECT o.table_no,
 					       oi.order_item_id,
@@ -59,11 +58,8 @@ public class AccountingServlet extends HttpServlet {
 
 			try (PreparedStatement ps = conn.prepareStatement(sql)) {
 				ps.setInt(1, orderId);
-
 				try (ResultSet rs = ps.executeQuery()) {
-					// 履歴画面と同じMapによる集約ロジック
 					Map<Integer, OrderItem> itemMap = new LinkedHashMap<>();
-
 					while (rs.next()) {
 						int itemId = rs.getInt("order_item_id");
 						tableNo = rs.getInt("table_no");
@@ -79,7 +75,6 @@ public class AccountingServlet extends HttpServlet {
 							itemMap.put(itemId, item);
 						}
 
-						// オプションがあれば追加
 						String optName = rs.getString("option_name");
 						if (optName != null) {
 							MenuOptionDTO opt = new MenuOptionDTO();
@@ -89,15 +84,11 @@ public class AccountingServlet extends HttpServlet {
 						}
 					}
 					list = new ArrayList<>(itemMap.values());
-
-					// ★ 合計金額の計算（(商品単価 + オプション単価合計) × 数量）
 					for (OrderItem oi : list) {
-						int itemFullPrice = oi.getPrice() + oi.getOptionTotalPrice();
-						totalAmount += itemFullPrice * oi.getQuantity();
+						totalAmount += (oi.getPrice() + oi.getOptionTotalPrice()) * oi.getQuantity();
 					}
 				}
 			}
-
 		} catch (Exception e) {
 			throw new ServletException(e);
 		}
@@ -106,87 +97,49 @@ public class AccountingServlet extends HttpServlet {
 		request.setAttribute("totalAmount", totalAmount);
 		request.setAttribute("tableNo", tableNo);
 		request.setAttribute("orderId", orderId);
-
 		request.getRequestDispatcher("/WEB-INF/jsp/Accounting.jsp").forward(request, response);
 	}
 
-	// =========================
-	// 会計確定（POST）
-	// =========================
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
 		String action = request.getParameter("action");
+		HttpSession session = request.getSession();
 
-		// =========================
-		// 会計開始（TableSelect → Accounting）
-		// =========================
 		if ("startAccounting".equals(action)) {
-
 			String tableStr = request.getParameter("tableNumber");
-			if (tableStr == null) {
-				throw new ServletException("テーブル番号が送信されていません");
-			}
-
+			if (tableStr == null)
+				throw new ServletException("テーブル番号なし");
 			int tableNo = Integer.parseInt(tableStr.replace("番", ""));
 
-			HttpSession session = request.getSession();
-
-			// tableNo から NEW の orderId を取得
 			try (Connection conn = DBManager.getConnection()) {
-
-				String sql = """
-						    SELECT order_id
-						    FROM orders
-						    WHERE table_no = ? AND status = 'NEW'
-						""";
-
+				String sql = "SELECT order_id FROM orders WHERE table_no = ? AND status = 'NEW'";
 				try (PreparedStatement ps = conn.prepareStatement(sql)) {
 					ps.setInt(1, tableNo);
-
 					try (ResultSet rs = ps.executeQuery()) {
 						if (rs.next()) {
 							session.setAttribute("orderId", rs.getInt("order_id"));
 							session.setAttribute("tableNo", tableNo);
 						} else {
-							throw new ServletException("未会計の注文がありません");
+							throw new ServletException("未会計の注文なし");
 						}
 					}
 				}
 			} catch (Exception e) {
 				throw new ServletException(e);
 			}
-
-			// ★ 会計画面表示へ（GET）
 			response.sendRedirect("AccountingServlet");
 			return;
 		}
 
-		// =========================
-		// 会計確定（Accounting.jsp → Complete）
-		// =========================
-
-		HttpSession session = request.getSession();
 		Integer orderId = (Integer) session.getAttribute("orderId");
-		Integer tableNo = (Integer) session.getAttribute("tableNo");
+		if (orderId == null)
+			throw new ServletException("会計対象なし");
 
-		if (orderId == null) {
-			throw new ServletException("会計対象の注文が見つかりません");
-		}
-
-		int totalAmount = Integer.parseInt(request.getParameter("totalAmount"));
-		int deposit = Integer.parseInt(request.getParameter("deposit"));
-		int change = deposit - totalAmount;
-
+		// 会計確定処理
 		try (Connection conn = DBManager.getConnection()) {
-
-			String sql = """
-					    UPDATE orders
-					    SET status = 'PAID'
-					    WHERE order_id = ?
-					""";
-
+			String sql = "UPDATE orders SET status = 'PAID' WHERE order_id = ?";
 			try (PreparedStatement ps = conn.prepareStatement(sql)) {
 				ps.setInt(1, orderId);
 				ps.executeUpdate();
@@ -195,17 +148,13 @@ public class AccountingServlet extends HttpServlet {
 			throw new ServletException(e);
 		}
 
-		request.setAttribute("tableNo", tableNo);
-		request.setAttribute("totalAmount", totalAmount);
-		request.setAttribute("deposit", deposit);
-		request.setAttribute("change", change);
-
+		// ★ 会計確定に伴い、お客様の注文情報を消去（これでCheckout.jspの自動遷移が発動する）
 		session.removeAttribute("orderId");
-		session.removeAttribute("tableNo");
+		session.removeAttribute("isPaid");
 		session.removeAttribute("persons");
+		session.removeAttribute("tableNo");
 
-		request.getRequestDispatcher("/WEB-INF/jsp/AccountingComplete.jsp")
-				.forward(request, response);
+		// 店員側はテーブル一覧へ戻る
+		response.sendRedirect("TableSelectServlet");
 	}
-
 }
