@@ -17,11 +17,10 @@ body {
 	width: 100vw;
 }
 
-/* メインコンテンツ：右側に押しつぶされないよう調整 */
+/* メインコンテンツ */
 .main-content {
 	flex: 1;
 	min-width: 0;
-	/* 子要素のスライダーが原因で突き抜けるのを防ぐ */
 	display: flex;
 	flex-direction: column;
 	padding: 20px;
@@ -31,25 +30,41 @@ body {
 /* カテゴリナビゲーション */
 .category-nav form {
 	display: flex;
-	gap: 8px;
+	gap: 5px;
+	/* 隙間を少し詰める */
 	width: 100%;
+	align-items: flex-end;
+	/* 下揃えにすることで浮き上がりを表現 */
+	height: 60px;
+	/* ナビゲーションの高さ固定 */
 }
 
 .category-nav button {
 	flex: 1;
-	padding: 15px 5px;
+	padding: 10px 5px;
 	background-color: #8D6E63;
-	color: white;
+	color: rgba(255, 255, 255, 0.8);
 	border: none;
-	border-radius: 5px 5px 0 0;
+	border-radius: 10px 10px 0 0;
 	cursor: pointer;
 	font-weight: bold;
 	font-size: 14px;
-	transition: 0.3s;
+	transition: all 0.2s ease;
+	height: 45px;
+	/* 非選択時は少し低く */
 }
 
+/* ★選択中のカテゴリボタン：大きく強調★ */
 .category-nav button.active {
 	background-color: #E64A19;
+	color: white;
+	font-size: 17px;
+	/* 文字を大きく */
+	height: 60px;
+	/* 高さを出して飛び出させる */
+	padding-top: 15px;
+	box-shadow: 0 -3px 8px rgba(0, 0, 0, 0.2);
+	z-index: 10;
 }
 
 /* 商品スライダー */
@@ -58,7 +73,8 @@ body {
 	display: flex;
 	align-items: center;
 	position: relative;
-	margin: 15px 0;
+	margin: 0 0 15px 0;
+	/* カテゴリとの隙間を調整 */
 	overflow: hidden;
 }
 
@@ -128,7 +144,6 @@ body {
 	border-radius: 8px;
 	margin: 0 5px;
 	flex-shrink: 0;
-	/* 矢印自体も潰れないように */
 }
 
 /* 会計ボタン */
@@ -149,18 +164,16 @@ body {
 	box-shadow: 0 4px 0 #BF360C;
 }
 
-/* 右サイドバー：絶対に潰れないように設定 */
+/* 右サイドバー */
 .sidebar {
 	width: 280px;
 	flex-shrink: 0;
-	/* これが重要：左側のコンテンツに押されても縮まない */
 	background-color: #EFEBE9;
 	display: flex;
 	flex-direction: column;
 	padding: 20px;
 	border-left: 3px solid #D7CCC8;
 	box-sizing: border-box;
-	/* パディングを含めて280pxにする */
 }
 
 .cart-header {

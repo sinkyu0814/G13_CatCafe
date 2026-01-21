@@ -15,13 +15,21 @@
 		<main class="main-content">
 			<nav class="category-nav">
 				<form action="ListServlet" method="get">
-					<button name="category" value="Recomend" class="active">おすすめ</button>
-					<button name="category" value="Cofe">珈琲</button>
-					<button name="category" value="Tea">紅茶</button>
-					<button name="category" value="Eat">主食</button>
-					<button name="category" value="Sweets">スイーツ</button>
-					<button name="category" value="SoftDrink">ソフトドリンク</button>
-					<button name="category" value="Morning">モーニング</button>
+					<%-- 三項演算子で現在のカテゴリと一致する場合に active クラスを付与 --%>
+					<button name="category" value="Recomend"
+						class="${(empty param.category or param.category == 'Recomend') ? 'active' : ''}">おすすめ</button>
+					<button name="category" value="Cofe"
+						class="${param.category == 'Cofe' ? 'active' : ''}">珈琲</button>
+					<button name="category" value="Tea"
+						class="${param.category == 'Tea' ? 'active' : ''}">紅茶</button>
+					<button name="category" value="Eat"
+						class="${param.category == 'Eat' ? 'active' : ''}">主食</button>
+					<button name="category" value="Sweets"
+						class="${param.category == 'Sweets' ? 'active' : ''}">スイーツ</button>
+					<button name="category" value="SoftDrink"
+						class="${param.category == 'SoftDrink' ? 'active' : ''}">ソフトドリンク</button>
+					<button name="category" value="Morning"
+						class="${param.category == 'Morning' ? 'active' : ''}">モーニング</button>
 				</form>
 			</nav>
 

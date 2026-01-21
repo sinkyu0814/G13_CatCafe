@@ -18,12 +18,11 @@ public class SalesDAO {
 	public List<SalesDTO> getSalesData(String type, String year, String month) {
 		Map<String, SalesDTO> dbDataMap = new HashMap<>();
 
-		// 売上計算（商品代＋オプション代）
-		String priceCalc = "SUM((i.price * i.quantity) + " +
+		// 【修正】オプション単価の合計に商品数量(i.quantity)を掛けるように変更
+		String priceCalc = "SUM((i.price + " +
 				"NVL((SELECT SUM(oio.option_price) FROM ORDER_ITEM_OPTIONS oio " +
-				"WHERE oio.order_item_id = i.order_item_id), 0))";
+				"WHERE oio.order_item_id = i.order_item_id), 0)) * i.quantity)";
 
-		// 【修正完了】DBのカラム名 persons を使用
 		String visitorCalc = "SUM(o.persons)";
 
 		String sql = "";
