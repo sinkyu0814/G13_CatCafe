@@ -10,6 +10,7 @@ import jakarta.servlet.annotation.WebServlet; // 追加
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/ResetAllTablesServlet") // ★ これを忘れると別のサーブレットに飛ぶことがあります
 public class ResetAllTablesServlet extends HttpServlet {
@@ -18,6 +19,11 @@ public class ResetAllTablesServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("isLoggedIn") == null) {
+			response.sendRedirect("LoginServlet");
+			return;
+		}
 		// 未会計（NEW）の注文をすべて会計済み（PAID）にする
 		String sql = "UPDATE orders SET status = 'PAID' WHERE status = 'NEW'";
 

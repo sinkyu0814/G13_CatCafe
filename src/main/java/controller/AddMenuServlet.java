@@ -16,6 +16,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import model.dto.MenuDTO;
 import model.service.MenuService;
@@ -29,6 +30,12 @@ public class AddMenuServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("isLoggedIn") == null) {
+			response.sendRedirect("LoginServlet");
+			return;
+		}
 		// ★ メニュー一覧取得
 		MenuService service = new MenuService();
 		List<MenuDTO> menuList = service.getMenuList("all");
@@ -38,11 +45,15 @@ public class AddMenuServlet extends HttpServlet {
 		rd.forward(request, response);
 	}
 
-	
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("isLoggedIn") == null) {
+			response.sendRedirect("LoginServlet");
+			return;
+		}
 		request.setCharacterEncoding("UTF-8");
 
 		try {

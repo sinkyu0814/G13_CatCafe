@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.dto.MenuDTO;
 import model.service.MenuService;
+
 @WebServlet("/TableSelectServlet")
 public class TableSelectServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -33,7 +34,18 @@ public class TableSelectServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		HttpSession session = request.getSession();
+		HttpSession session = request.getSession(true); // 記録のためにsessionを作成
+		if (session.getAttribute("isLoggedIn") == null) {
+			// ★ 今のリクエストURLを保存（例: "AdminServlet"）
+			String uri = request.getRequestURI();
+			String query = request.getQueryString();
+			String target = (query == null) ? uri : uri + "?" + query;
+
+			session.setAttribute("targetURI", target);
+
+			response.sendRedirect("LoginServlet");
+			return;
+		}
 		Integer persons = (Integer) session.getAttribute("persons");
 		request.setAttribute("persons", persons);
 
@@ -89,6 +101,11 @@ public class TableSelectServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("isLoggedIn") == null) {
+			response.sendRedirect("LoginServlet");
+			return;
+		}
 		doGet(request, response);
 	}
 }

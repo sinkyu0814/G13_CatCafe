@@ -11,6 +11,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import model.dto.RankingDTO;
 
 @WebServlet("/RankingServlet")
@@ -18,6 +19,11 @@ public class RankingServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("isLoggedIn") == null) {
+			response.sendRedirect("LoginServlet");
+			return;
+		}
 		// --- 追加：集計タイプの取得 (all: セット, item: 商品のみ, option: オプションのみ) ---
 		String filterType = request.getParameter("filterType");
 		if (filterType == null)

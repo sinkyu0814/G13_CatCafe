@@ -19,6 +19,7 @@ import model.service.MenuService;
 @WebServlet("/ListServlet")
 public class ListServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
@@ -34,25 +35,30 @@ public class ListServlet extends HttpServlet {
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		//response.getWriter().append("Served at: ").append(request.getContextPath());
-		HttpSession session = request.getSession();
-	    Integer persons = (Integer) session.getAttribute("persons");
-	    request.setAttribute("persons", persons);
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("isLoggedIn") == null) {
+			response.sendRedirect("LoginServlet");
+			return;
+		}
+		Integer persons = (Integer) session.getAttribute("persons");
+		request.setAttribute("persons", persons);
 
-	    String category = request.getParameter("category");
-	    if (category == null) category = "Recomend";
+		String category = request.getParameter("category");
+		if (category == null)
+			category = "Recomend";
 
-	    model.service.MenuService service = new MenuService();
+		model.service.MenuService service = new MenuService();
 
-	    // カテゴリ一覧
-	    List<String> categories = service.getCategoryList();
-	    request.setAttribute("categoryList", categories);
+		// カテゴリ一覧
+		List<String> categories = service.getCategoryList();
+		request.setAttribute("categoryList", categories);
 
-	    // メニュー一覧
-	    List<MenuDTO> menuList = service.getMenuList(category);
-	    request.setAttribute("menuList", menuList);
+		// メニュー一覧
+		List<MenuDTO> menuList = service.getMenuList(category);
+		request.setAttribute("menuList", menuList);
 
-	    RequestDispatcher rd = request.getRequestDispatcher("WEB-INF/jsp/list.jsp");
-	    rd.forward(request, response);
+		RequestDispatcher rd = request.getRequestDispatcher("WEB-INF/jsp/list.jsp");
+		rd.forward(request, response);
 	}
 
 	/**
@@ -60,9 +66,13 @@ public class ListServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("isLoggedIn") == null) {
+			response.sendRedirect("LoginServlet");
+			return;
+		}
 		// TODO Auto-generated method stub
-//		doGet(request, response);
+		//		doGet(request, response);
 	}
 
 }
-

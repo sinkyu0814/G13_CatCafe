@@ -26,8 +26,12 @@ public class AccountingServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("isLoggedIn") == null) {
+			response.sendRedirect("LoginServlet");
+			return;
+		}
 
-		HttpSession session = request.getSession();
 		Integer orderId = (Integer) session.getAttribute("orderId");
 
 		if (orderId == null) {
@@ -105,7 +109,11 @@ public class AccountingServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		String action = request.getParameter("action");
-		HttpSession session = request.getSession();
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("isLoggedIn") == null) {
+			response.sendRedirect("LoginServlet");
+			return;
+		}
 
 		if ("startAccounting".equals(action)) {
 			String tableStr = request.getParameter("tableNumber");

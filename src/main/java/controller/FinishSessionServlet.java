@@ -17,6 +17,10 @@ public class FinishSessionServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("isLoggedIn") == null) {
+			response.sendRedirect("LoginServlet");
+			return;
+		}
 		if (session != null) {
 			// ★ 重要：fixedTableNo（店員設定）以外をすべて消去する
 			session.removeAttribute("orderId");

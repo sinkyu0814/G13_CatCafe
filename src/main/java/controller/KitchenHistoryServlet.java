@@ -8,11 +8,17 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/KitchenHistoryServlet")
 public class KitchenHistoryServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("isLoggedIn") == null) {
+			response.sendRedirect("LoginServlet");
+			return;
+		}
 		KitchenOrderDAO dao = new KitchenOrderDAO();
 		try {
 			request.setAttribute("history", dao.findDeliveredOrders());
@@ -21,9 +27,14 @@ public class KitchenHistoryServlet extends HttpServlet {
 			throw new ServletException(e);
 		}
 	}
-	
+
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("isLoggedIn") == null) {
+			response.sendRedirect("LoginServlet");
+			return;
+		}
 		String action = request.getParameter("action");
 		KitchenOrderDAO dao = new KitchenOrderDAO();
 
@@ -42,5 +53,5 @@ public class KitchenHistoryServlet extends HttpServlet {
 			throw new ServletException(e);
 		}
 		response.sendRedirect("KitchenHistoryServlet");
-	}	
+	}
 }
