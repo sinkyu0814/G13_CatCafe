@@ -20,6 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.dto.MenuOptionDTO;
 import viewmodel.OrderItem;
+
 @WebServlet("/HistoryServlet")
 public class HistoryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -40,7 +41,6 @@ public class HistoryServlet extends HttpServlet {
 		List<OrderItem> historyList = new ArrayList<>();
 		int totalAmount = 0;
 		Integer tableNo = null;
-		
 
 		/*━━━━━━━━━━━━━━━━━━━━━
 		 * 2. DBから注文履歴を取得
