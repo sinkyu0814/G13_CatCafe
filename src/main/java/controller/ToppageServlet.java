@@ -106,6 +106,6 @@ public class ToppageServlet extends HttpServlet {
 		} catch (Exception e) {
 			throw new ServletException(e);
 		}
-		response.sendRedirect("ListServlet");
+		response.sendRedirect("ToppageServlet");
 	}
 }

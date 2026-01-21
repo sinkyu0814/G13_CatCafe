@@ -10,19 +10,24 @@
 
 	<h1>システムメイン画面</h1>
 
-	<!-- お客様用画面 -->
+	<form action="LoginServlet" method="get">
+		<button type="submit">ログイン画面へ</button>
+	</form>
+	<br>
+
+	<hr>
+	<br>
+
 	<form action="ToppageServlet" method="get">
 		<button type="submit">お客様用画面へ</button>
 	</form>
 	<br>
 
-	<!-- キッチン用画面 -->
 	<form action="KitchenOrderServlet" method="get">
 		<button type="submit">キッチン画面へ</button>
 	</form>
 	<br>
 
-	<!-- 従業員用（管理用）画面 -->
 	<form action="AdminServlet" method="get">
 		<button type="submit">管理画面へ</button>
 	</form>
@@ -31,6 +36,7 @@
 	<form action="TableSelectServlet" method="get">
 		<button type="submit">レジ画面へ</button>
 	</form>
+
 </body>
 
 </html>

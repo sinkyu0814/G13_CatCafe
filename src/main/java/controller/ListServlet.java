@@ -20,12 +20,8 @@ import model.service.MenuService;
 public class ListServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
 	public ListServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -33,13 +29,16 @@ public class ListServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		//response.getWriter().append("Served at: ").append(request.getContextPath());
+
+		// ★ ログインガードを削除しました（お客様用画面のため）
+
 		HttpSession session = request.getSession(false);
-		if (session == null || session.getAttribute("isLoggedIn") == null) {
-			response.sendRedirect("LoginServlet");
+		// セッションが切れている場合の最低限のチェックのみ残します
+		if (session == null || session.getAttribute("persons") == null) {
+			response.sendRedirect("ToppageServlet");
 			return;
 		}
+
 		Integer persons = (Integer) session.getAttribute("persons");
 		request.setAttribute("persons", persons);
 
@@ -66,13 +65,8 @@ public class ListServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		HttpSession session = request.getSession(false);
-		if (session == null || session.getAttribute("isLoggedIn") == null) {
-			response.sendRedirect("LoginServlet");
-			return;
-		}
-		// TODO Auto-generated method stub
-		//		doGet(request, response);
+		// ★ ここもガードを削除しました
+		doGet(request, response);
 	}
 
 }
