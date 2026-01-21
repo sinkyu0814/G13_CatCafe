@@ -21,18 +21,16 @@ public class KitchenOrderDAO {
 	public List<KitchenOrderDTO> findDeliveredOrders() throws Exception {
 		return findByStatus("DELIVERED");
 	}
-	
-	
+
 	private List<KitchenOrderDTO> findByStatus(String mode) throws Exception {
 		Map<Integer, KitchenOrderDTO> map = new LinkedHashMap<>();
 		String statusCondition = mode.equals("DELIVERED") ? "= 'DELIVERED'" : "!= 'DELIVERED'";
 
 		String sql = "SELECT o.order_id, o.table_no, o.order_date, i.order_item_id, i.goods_name, i.quantity, i.kitchen_status, oio.option_name "
-				+
-				"FROM orders o JOIN order_items i ON o.order_id = i.order_id " +
-				"LEFT JOIN order_item_options oio ON i.order_item_id = oio.order_item_id " +
-				"WHERE i.kitchen_status " + statusCondition + " AND o.status != 'PAID' " +
-				"ORDER BY o.order_date ASC, i.order_item_id ASC";
+				+ "FROM orders o JOIN order_items i ON o.order_id = i.order_id "
+				+ "LEFT JOIN order_item_options oio ON i.order_item_id = oio.order_item_id "
+				+ "WHERE i.kitchen_status " + statusCondition + " AND o.status != 'PAID' "
+				+ "ORDER BY o.order_date ASC, i.order_item_id ASC";
 
 		try (Connection conn = DBManager.getConnection();
 				PreparedStatement ps = conn.prepareStatement(sql);
@@ -60,7 +58,6 @@ public class KitchenOrderDAO {
 		return new ArrayList<>(map.values());
 	}
 
-	// ステータス更新
 	public void updateStatus(int orderItemId, String status) throws Exception {
 		String sql = "UPDATE order_items SET kitchen_status = ? WHERE order_item_id = ?";
 		try (Connection conn = DBManager.getConnection();
@@ -71,9 +68,7 @@ public class KitchenOrderDAO {
 		}
 	}
 
-	// 履歴からの物理削除
 	public void deleteOrderItem(int orderItemId) throws Exception {
-		// オプションを先に消す必要がある(外部キー制約)
 		String sqlOpt = "DELETE FROM order_item_options WHERE order_item_id = ?";
 		String sqlItem = "DELETE FROM order_items WHERE order_item_id = ?";
 		try (Connection conn = DBManager.getConnection()) {
@@ -93,8 +88,8 @@ public class KitchenOrderDAO {
 	}
 
 	public void deleteAllDeliveredItems() throws Exception {
-		String sqlOpt = "DELETE FROM order_item_options WHERE order_item_id IN " +
-				"(SELECT order_item_id FROM order_items WHERE kitchen_status = 'DELIVERED')";
+		String sqlOpt = "DELETE FROM order_item_options WHERE order_item_id IN "
+				+ "(SELECT order_item_id FROM order_items WHERE kitchen_status = 'DELIVERED')";
 		String sqlItem = "DELETE FROM order_items WHERE kitchen_status = 'DELIVERED'";
 
 		try (Connection conn = DBManager.getConnection()) {
@@ -110,5 +105,19 @@ public class KitchenOrderDAO {
 			}
 		}
 	}
-	
+
+	// ★ 整合性修正：ステータスがNULLの場合も未提供としてカウントするように修正
+	public boolean hasUnfinishedItems(long orderId) throws Exception {
+		String sql = "SELECT COUNT(*) FROM order_items WHERE order_id = ? AND (kitchen_status != 'DELIVERED' OR kitchen_status IS NULL)";
+		try (Connection conn = DBManager.getConnection();
+				PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setLong(1, orderId);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					return rs.getInt(1) > 0;
+				}
+			}
+		}
+		return false;
+	}
 }

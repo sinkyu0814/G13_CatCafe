@@ -9,6 +9,19 @@
 <title>会計確認</title>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/check.css">
+
+<script>
+	function confirmCheckout() {
+		// ★ 整合性修正：EL式を一行にまとめ、JSが正しく真偽値を判定できるようにしました
+		const hasUnfinished = ${not empty hasUnfinished && hasUnfinished ? "true" : "false"};
+
+		if (hasUnfinished) {
+			return confirm("まだ提供されていない商品がありますが、会計を確定してもよろしいですか？");
+		} else {
+			return confirm("会計を確定します。よろしいですか？");
+		}
+	}
+</script>
 </head>
 <body>
 
@@ -17,8 +30,6 @@
 			<h1>
 				会計確認 <span class="table-no">（テーブル: ${tableNo}）</span>
 			</h1>
-
-			<%-- 前の履歴画面へ戻る --%>
 			<form action="HistoryServlet" method="GET" class="header-form">
 				<input type="hidden" name="orderId" value="${orderId}">
 				<button type="submit" class="back-link-button">注文履歴へ戻る</button>
@@ -64,7 +75,6 @@
 								<td class="td-qty">${item.quantity}個</td>
 							</tr>
 						</c:forEach>
-
 						<c:if test="${empty items}">
 							<tr>
 								<td colspan="4" class="empty-msg">注文内容が見つかりません。</td>
@@ -80,20 +90,18 @@
 						上記の内容で<br>会計を確定しますか？
 					</p>
 				</div>
-
 				<div class="total-price-box">
 					<span class="total-price-label">お支払い合計</span> <span
 						class="total-price-value">${totalAmount}円</span> <span
 						class="tax-label">(税込)</span>
 				</div>
-
 				<form action="CheckoutServlet" method="POST" class="action-buttons">
 					<input type="hidden" name="orderId" value="${orderId}">
-					<button type="submit" class="complete-button">会計を確定する</button>
+					<button type="submit" class="complete-button"
+						onclick="return confirmCheckout()">会計を確定する</button>
 				</form>
 			</aside>
 		</div>
 	</div>
-
 </body>
 </html>
