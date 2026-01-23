@@ -17,36 +17,24 @@ import model.service.MenuService;
 import viewmodel.CartItem;
 
 @WebServlet("/CartAddServlet")
-/**
- * Servlet implementation class CartAddServlet
- */
 public class CartAddServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
 	public CartAddServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		//		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
+
 		request.setCharacterEncoding("UTF-8");
+
+		// ★ カテゴリ情報を取得
+		String category = request.getParameter("category");
 
 		int id = Integer.parseInt(request.getParameter("id"));
 		int quantity = Integer.parseInt(request.getParameter("quantity"));
@@ -76,7 +64,6 @@ public class CartAddServlet extends HttpServlet {
 		// 同じ商品があるなら数量を増やす
 		boolean found = false;
 		for (CartItem item : cart) {
-			// 商品IDが一致し、かつ選択されたオプションの内容が一致するか
 			if (item.getGoodsId() == id && isSameOptions(item.getSelectedOptions(), selectedOptions)) {
 				item.setQuantity(item.getQuantity() + quantity);
 				found = true;
@@ -92,12 +79,15 @@ public class CartAddServlet extends HttpServlet {
 		}
 
 		session.setAttribute("cart", cart);
-		response.sendRedirect("ListServlet");
+
+		// ★ 修正：リダイレクトURLにカテゴリを付与する
+		if (category != null && !category.isEmpty()) {
+			response.sendRedirect("ListServlet?category=" + category);
+		} else {
+			response.sendRedirect("ListServlet");
+		}
 	}
 
-	/**
-	 * カート内のアイテムと、新しく追加しようとしているアイテムのオプションが一致するか判定
-	 */
 	private boolean isSameOptions(List<MenuOptionDTO> list1, List<MenuOptionDTO> list2) {
 		if (list1 == null && list2 == null)
 			return true;
@@ -106,7 +96,6 @@ public class CartAddServlet extends HttpServlet {
 		if (list1.size() != list2.size())
 			return false;
 
-		// IDのリストにして比較（順不同に対応するため）
 		List<Integer> ids1 = list1.stream().map(MenuOptionDTO::getOptionId).sorted().toList();
 		List<Integer> ids2 = list2.stream().map(MenuOptionDTO::getOptionId).sorted().toList();
 

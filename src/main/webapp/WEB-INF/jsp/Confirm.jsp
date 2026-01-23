@@ -30,6 +30,7 @@
 				<p class="product-category">カテゴリ：${menu.category}</p>
 
 				<form action="CartAddServlet" method="post" class="add-to-cart-form">
+					<%-- 商品IDとカテゴリ情報をhiddenで送信 --%>
 					<input type="hidden" name="id" value="${menu.id}"> <input
 						type="hidden" name="category" value="${param.category}">
 
