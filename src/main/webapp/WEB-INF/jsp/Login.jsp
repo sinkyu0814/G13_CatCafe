@@ -31,12 +31,12 @@
 			<form action="LoginServlet" method="post" class="login-form">
 				<div class="input-group">
 					<label for="username">ユーザー名</label> <input type="text"
-						name="username" id="username" required placeholder="G13">
+						name="username" id="username" required placeholder="G13">G13
 				</div>
 
 				<div class="input-group">
 					<label for="password">パスワード</label> <input type="password"
-						name="password" id="password" required placeholder="2136">
+						name="password" id="password" required placeholder="2136">2136
 				</div>
 
 				<button type="submit" class="login-button">ログイン</button>
