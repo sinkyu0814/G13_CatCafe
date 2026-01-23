@@ -132,7 +132,6 @@ public class AccountingServlet extends HttpServlet {
 							session.setAttribute("tableNo", tableNo);
 							response.sendRedirect("AccountingServlet");
 						} else {
-							// ★ 修正点：空席だった場合はエラーをセッションに格納して戻す
 							session.setAttribute("tableSelectError", tableNo + "番テーブルは現在空席です。");
 							response.sendRedirect("TableSelectServlet");
 						}
@@ -144,9 +143,20 @@ public class AccountingServlet extends HttpServlet {
 			return;
 		}
 
+		// --- 会計確定処理 ---
 		Integer orderId = (Integer) session.getAttribute("orderId");
+		Integer tableNo = (Integer) session.getAttribute("tableNo");
+
 		if (orderId == null)
 			throw new ServletException("会計対象なし");
+
+		// ★ ここが重要：JSPから送られてくる金額と預かり金を取得して計算する
+		String totalStr = request.getParameter("totalAmount");
+		String depositStr = request.getParameter("deposit");
+
+		int totalAmount = (totalStr != null && !totalStr.isEmpty()) ? Integer.parseInt(totalStr) : 0;
+		int deposit = (depositStr != null && !depositStr.isEmpty()) ? Integer.parseInt(depositStr) : 0;
+		int change = deposit - totalAmount;
 
 		try (Connection conn = DBManager.getConnection()) {
 			String sql = "UPDATE orders SET status = 'PAID' WHERE order_id = ?";
@@ -158,11 +168,20 @@ public class AccountingServlet extends HttpServlet {
 			throw new ServletException(e);
 		}
 
+		// ★ 重要：JSPで表示するために request にセットする
+		// これを忘れると AccountingComplete.jsp で null になります
+		request.setAttribute("tableNo", tableNo);
+		request.setAttribute("totalAmount", totalAmount);
+		request.setAttribute("deposit", deposit);
+		request.setAttribute("change", change);
+
+		// ★ 重要：セッションを消去する前に、必要なデータ（上記）はリクエストに移したので安全です
 		session.removeAttribute("orderId");
 		session.removeAttribute("isPaid");
 		session.removeAttribute("persons");
 		session.removeAttribute("tableNo");
 
+		// 完了画面へ
 		request.getRequestDispatcher("/WEB-INF/jsp/AccountingComplete.jsp").forward(request, response);
 	}
 }

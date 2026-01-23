@@ -10,21 +10,22 @@
 </head>
 <body>
 	<%
-    Integer tableNo = (Integer) request.getAttribute("tableNo");
-    Integer totalAmount = (Integer) request.getAttribute("totalAmount");
-    Integer deposit = (Integer) request.getAttribute("deposit");
-    Integer change = (Integer) request.getAttribute("change");
+	// Servletの request.setAttribute から値を取得
+	Integer tableNo = (Integer) request.getAttribute("tableNo");
+	Integer totalAmount = (Integer) request.getAttribute("totalAmount");
+	Integer deposit = (Integer) request.getAttribute("deposit");
+	Integer change = (Integer) request.getAttribute("change");
 
-    NumberFormat nf = NumberFormat.getNumberInstance();
-    %>
+	NumberFormat nf = NumberFormat.getNumberInstance();
+	%>
 
 	<div class="complete-box">
 		<h1>✅ お会計が完了しました</h1>
 
 		<div class="amount-detail">
 			<div>
-				テーブル番号： <span class="highlight"> <%=tableNo != null ? tableNo : "-"%>
-				</span>
+				テーブル番号： <span class="highlight"> <%=(tableNo != null) ? tableNo : "-"%>
+				</span> 番
 			</div>
 
 			<hr>
@@ -41,14 +42,16 @@
 
 			<hr>
 
-			<div>
+			<div class="change-row">
 				おつり： <span class="highlight change-amount"> <%=nf.format(change != null ? change : 0)%>
 				</span> 円
 			</div>
 		</div>
 
-		<button type="button" onclick="location.href='TableSelectServlet'">
-			席選択画面に戻る</button>
+		<div class="btn-area">
+			<button type="button" onclick="location.href='TableSelectServlet'">
+				席選択画面に戻る</button>
+		</div>
 	</div>
 </body>
 </html>
