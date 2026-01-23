@@ -26,23 +26,23 @@ public class ConfirmOrderServlet extends HttpServlet {
 		// 1. カート取得
 		// -------------------------
 		List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+
+		// ★例外処理：カートが空の場合、ListServletへ戻す
 		if (cart == null || cart.isEmpty()) {
-			request.setAttribute("error", "カートが空です");
-			request.getRequestDispatcher("/WEB-INF/jsp/list.jsp")
-					.forward(request, response);
+			request.setAttribute("error", "カートが空です。注文する商品を選んでください。");
+			// ListServletのdoGetを通るようにフォワード（メニュー再取得のため）
+			request.getRequestDispatcher("ListServlet").forward(request, response);
 			return;
 		}
 
 		// -------------------------
-		// 2. orderId 取得（注文開始時に作成済み）
+		// 2. orderId 取得
 		// -------------------------
 		Integer orderId = (Integer) session.getAttribute("orderId");
 
-		// ★修正：例外を投げずに、エラーメッセージを出して初期画面へ戻す
 		if (orderId == null) {
 			request.setAttribute("error", "セッションの有効期限が切れました。最初からやり直してください。");
-			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp")
-					.forward(request, response);
+			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp").forward(request, response);
 			return;
 		}
 
@@ -62,11 +62,9 @@ public class ConfirmOrderServlet extends HttpServlet {
 		// -------------------------
 		session.removeAttribute("cart");
 
-		// 完了画面表示用のデータをセット
 		request.setAttribute("orderId", orderId);
 		request.setAttribute("orderItems", cart);
 
-		request.getRequestDispatcher("/WEB-INF/jsp/orderComplete.jsp")
-				.forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/jsp/orderComplete.jsp").forward(request, response);
 	}
 }

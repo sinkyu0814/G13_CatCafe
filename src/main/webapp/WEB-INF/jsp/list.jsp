@@ -8,6 +8,20 @@
 <title>メニュー画面</title>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/menulist.css">
+<style>
+/* カート内警告メッセージのスタイル */
+.cart-warning {
+	color: #e74c3c;
+	background-color: #fdf2f2;
+	padding: 10px;
+	margin: 10px;
+	border: 1px solid #e74c3c;
+	border-radius: 4px;
+	font-size: 0.85em;
+	text-align: center;
+	font-weight: bold;
+}
+</style>
 </head>
 <body>
 
@@ -15,7 +29,6 @@
 		<main class="main-content">
 			<nav class="category-nav">
 				<form action="ListServlet" method="get">
-					<%-- 三項演算子で現在のカテゴリと一致する場合に active クラスを付与 --%>
 					<button name="category" value="Recomend"
 						class="${(empty param.category or param.category == 'Recomend') ? 'active' : ''}">おすすめ</button>
 					<button name="category" value="Cofe"
@@ -70,6 +83,11 @@
 			<div class="cart-header">カート</div>
 
 			<div class="cart-content">
+				<%-- ★ 修正：カートが空で、かつエラーメッセージがある場合に表示 --%>
+				<c:if test="${empty cart and not empty error}">
+					<div class="cart-warning">${error}</div>
+				</c:if>
+
 				<c:if test="${not empty cart}">
 					<c:forEach var="c" items="${cart}" varStatus="status">
 						<div class="cart-row"

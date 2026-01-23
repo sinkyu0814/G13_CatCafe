@@ -13,9 +13,6 @@ import jakarta.servlet.http.HttpSession;
 import model.dto.MenuDTO;
 import model.service.MenuService;
 
-/**
- * Servlet implementation class ListServlet
- */
 @WebServlet("/ListServlet")
 public class ListServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -24,16 +21,10 @@ public class ListServlet extends HttpServlet {
 		super();
 	}
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		// ★ ログインガードを削除しました（お客様用画面のため）
-
 		HttpSession session = request.getSession(false);
-		// セッションが切れている場合の最低限のチェックのみ残します
 		if (session == null || session.getAttribute("persons") == null) {
 			response.sendRedirect("ToppageServlet");
 			return;
@@ -48,25 +39,21 @@ public class ListServlet extends HttpServlet {
 
 		model.service.MenuService service = new MenuService();
 
-		// カテゴリ一覧
+		// カテゴリ一覧・メニュー一覧の取得
 		List<String> categories = service.getCategoryList();
 		request.setAttribute("categoryList", categories);
 
-		// メニュー一覧
 		List<MenuDTO> menuList = service.getMenuList(category);
 		request.setAttribute("menuList", menuList);
 
+		// ★ConfirmOrderServletからのエラー（request属性）はそのまま JSP へ引き継がれる
 		RequestDispatcher rd = request.getRequestDispatcher("WEB-INF/jsp/list.jsp");
 		rd.forward(request, response);
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// ★ ここもガードを削除しました
+		// POST（ConfirmOrderServletからのフォワード）時もdoGetと同じ処理を行う
 		doGet(request, response);
 	}
-
 }
