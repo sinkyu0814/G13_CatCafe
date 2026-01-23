@@ -36,17 +36,6 @@
 		activeInput.value = activeInput.value.slice(0, -1);
 	}
 
-	// 送信時のチェック
-	//function checkSpecialCode(event) {
-	//	const val = document.getElementById('persons').value;
-	//	if (val === "2136") {
-	//		event.preventDefault();
-	//		location.href = "AdminTableSet.jsp"; // 店員用設定画面へ
-	//		return false;
-	//	}
-	//	return true;
-	//}
-
 	window.onload = function() {
 		setActive('persons');
 	};
