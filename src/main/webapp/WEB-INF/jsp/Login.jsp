@@ -42,7 +42,7 @@
 				<button type="submit" class="login-button">ログイン</button>
 			</form>
 
-			<footer class="login-footer"> &copy; 2024 ねこまるカフェ System
+			<footer class="login-footer"> &copy; 2026 ねこまるカフェ System
 				Management </footer>
 		</div>
 	</div>
