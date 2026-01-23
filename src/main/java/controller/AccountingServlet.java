@@ -33,7 +33,6 @@ public class AccountingServlet extends HttpServlet {
 		}
 
 		Integer orderId = (Integer) session.getAttribute("orderId");
-
 		if (orderId == null) {
 			request.setAttribute("error", "注文情報が取得できません");
 			request.getRequestDispatcher("/WEB-INF/jsp/Accounting.jsp").forward(request, response);
@@ -117,8 +116,10 @@ public class AccountingServlet extends HttpServlet {
 
 		if ("startAccounting".equals(action)) {
 			String tableStr = request.getParameter("tableNumber");
-			if (tableStr == null)
-				throw new ServletException("テーブル番号なし");
+			if (tableStr == null || tableStr.isEmpty()) {
+				response.sendRedirect("TableSelectServlet");
+				return;
+			}
 			int tableNo = Integer.parseInt(tableStr.replace("番", ""));
 
 			try (Connection conn = DBManager.getConnection()) {
@@ -129,15 +130,17 @@ public class AccountingServlet extends HttpServlet {
 						if (rs.next()) {
 							session.setAttribute("orderId", rs.getInt("order_id"));
 							session.setAttribute("tableNo", tableNo);
+							response.sendRedirect("AccountingServlet");
 						} else {
-							throw new ServletException("未会計の注文なし");
+							// ★ 修正点：空席だった場合はエラーをセッションに格納して戻す
+							session.setAttribute("tableSelectError", tableNo + "番テーブルは現在空席です。");
+							response.sendRedirect("TableSelectServlet");
 						}
 					}
 				}
 			} catch (Exception e) {
 				throw new ServletException(e);
 			}
-			response.sendRedirect("AccountingServlet");
 			return;
 		}
 
@@ -145,7 +148,6 @@ public class AccountingServlet extends HttpServlet {
 		if (orderId == null)
 			throw new ServletException("会計対象なし");
 
-		// 会計確定処理
 		try (Connection conn = DBManager.getConnection()) {
 			String sql = "UPDATE orders SET status = 'PAID' WHERE order_id = ?";
 			try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -156,13 +158,11 @@ public class AccountingServlet extends HttpServlet {
 			throw new ServletException(e);
 		}
 
-		// ★ 会計確定に伴い、お客様の注文情報を消去（これでCheckout.jspの自動遷移が発動する）
 		session.removeAttribute("orderId");
 		session.removeAttribute("isPaid");
 		session.removeAttribute("persons");
 		session.removeAttribute("tableNo");
 
-		// 店員側はテーブル一覧へ戻る
-		response.sendRedirect("TableSelectServlet");
+		request.getRequestDispatcher("/WEB-INF/jsp/AccountingComplete.jsp").forward(request, response);
 	}
 }
