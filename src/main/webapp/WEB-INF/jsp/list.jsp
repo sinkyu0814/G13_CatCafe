@@ -9,7 +9,6 @@
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/menulist.css">
 <style>
-/* カート内警告メッセージのスタイル */
 .cart-warning {
 	color: #e74c3c;
 	background-color: #fdf2f2;
@@ -24,7 +23,6 @@
 </style>
 </head>
 <body>
-
 	<div class="container">
 		<main class="main-content">
 			<nav class="category-nav">
@@ -49,15 +47,12 @@
 			<div class="product-slider-wrapper">
 				<button type="button" class="slider-arrow left"
 					onclick="scrollGrid(-1)">＜</button>
-
 				<div class="product-grid" id="productGrid">
 					<c:forEach var="m" items="${menuList}">
 						<div class="menu-item">
 							<a href="ConfirmServlet?id=${m.id}&category=${param.category}">
 								<div class="img-container">
-									<img
-										src="${pageContext.request.contextPath}/assets/images/${m.img}"
-										alt="${m.name}">
+									<img src="GetImageServlet?id=${m.id}" alt="${m.name}">
 								</div>
 								<div class="item-info">
 									<p class="item-name">${m.name}</p>
@@ -67,7 +62,6 @@
 						</div>
 					</c:forEach>
 				</div>
-
 				<button type="button" class="slider-arrow right"
 					onclick="scrollGrid(1)">＞</button>
 			</div>
@@ -81,13 +75,10 @@
 
 		<aside class="sidebar">
 			<div class="cart-header">カート</div>
-
 			<div class="cart-content">
-				<%-- ★ 修正：カートが空で、かつエラーメッセージがある場合に表示 --%>
 				<c:if test="${empty cart and not empty error}">
 					<div class="cart-warning">${error}</div>
 				</c:if>
-
 				<c:if test="${not empty cart}">
 					<c:forEach var="c" items="${cart}" varStatus="status">
 						<div class="cart-row"
@@ -96,13 +87,10 @@
 								<span class="cart-item-name">${c.goodsName}</span>
 								<c:if test="${not empty c.selectedOptions}">
 									<div style="font-size: 0.75em; color: #666;">
-										<c:forEach var="opt" items="${c.selectedOptions}">
-											+${opt.optionName}
-										</c:forEach>
+										<c:forEach var="opt" items="${c.selectedOptions}">+${opt.optionName}</c:forEach>
 									</div>
 								</c:if>
 							</div>
-
 							<div class="cart-qty-area"
 								style="display: flex; align-items: center; gap: 5px;">
 								<form action="UpdateCartServlet" method="post"
@@ -113,9 +101,7 @@
 									<button type="submit" class="qty-btn"
 										style="width: 24px; height: 24px; padding: 0;">-</button>
 								</form>
-
 								<span class="cart-item-qty">${c.quantity}</span>
-
 								<form action="UpdateCartServlet" method="post"
 									style="margin: 0;">
 									<input type="hidden" name="index" value="${status.index}">
@@ -129,7 +115,6 @@
 					</c:forEach>
 				</c:if>
 			</div>
-
 			<div class="sidebar-footer">
 				<form action="HistoryServlet" method="get">
 					<button class="side-btn">注文履歴を見る</button>
@@ -140,7 +125,6 @@
 			</div>
 		</aside>
 	</div>
-
 	<script>
 		function scrollGrid(direction) {
 			const grid = document.getElementById('productGrid');
@@ -151,6 +135,5 @@
 			});
 		}
 	</script>
-
 </body>
 </html>

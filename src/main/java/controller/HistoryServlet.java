@@ -47,16 +47,14 @@ public class HistoryServlet extends HttpServlet {
 		 *━━━━━━━━━━━━━━━━━━━━━*/
 		try (Connection conn = DBManager.getConnection()) {
 
-			// order_date を SQL に合わせ、OrderItem クラスのフィールドに合わせる
+			// ★ 修正：m.image は BLOB なので取得項目から外す、または使用しない
 			String sql = """
 					SELECT
 					    o.order_id, o.order_date, o.status, o.table_no,
 					    oi.order_item_id, oi.menu_id, oi.goods_name, oi.price, oi.quantity,
-					    m.image,
 					    oio.option_name, oio.option_price
 					FROM orders o
 					JOIN order_items oi ON o.order_id = oi.order_id
-					LEFT JOIN menus m ON oi.menu_id = m.menu_id
 					LEFT JOIN order_item_options oio ON oi.order_item_id = oio.order_item_id
 					WHERE o.order_id = ?
 					ORDER BY oi.order_item_id ASC
@@ -66,7 +64,6 @@ public class HistoryServlet extends HttpServlet {
 				ps.setInt(1, orderId);
 
 				try (ResultSet rs = ps.executeQuery()) {
-					// 1つの商品に複数オプションがあるため、Mapで重複排除
 					Map<Integer, OrderItem> itemMap = new LinkedHashMap<>();
 
 					while (rs.next()) {
@@ -76,16 +73,23 @@ public class HistoryServlet extends HttpServlet {
 						if (item == null) {
 							item = new OrderItem();
 							item.setOrderId(rs.getInt("order_id"));
-							item.setOrderTime(rs.getTimestamp("order_date")); // order_dateに修正
+							item.setOrderTime(rs.getTimestamp("order_date"));
 							item.setStatus(rs.getString("status"));
 							item.setTableNo(rs.getInt("table_no"));
 							item.setOrderItemId(itemId);
+
+							// ★ 修正：menu_id をセット（StringかintかはOrderItemの定義に合わせる）
+							// GetImageServletで使うため必須です
 							item.setMenuId(rs.getString("menu_id"));
+
 							item.setName(rs.getString("goods_name"));
 							item.setPrice(rs.getInt("price"));
 							item.setQuantity(rs.getInt("quantity"));
-							item.setImage(rs.getString("image"));
-							item.setSelectedOptions(new ArrayList<>()); // OrderItemにList<MenuOptionDTO> optionsが必要
+
+							// ★ 修正：rs.getString("image") はエラーになるため削除
+							item.setImage(null);
+
+							item.setSelectedOptions(new ArrayList<>());
 
 							itemMap.put(itemId, item);
 
@@ -94,7 +98,6 @@ public class HistoryServlet extends HttpServlet {
 							}
 						}
 
-						// オプション情報があれば追加
 						String optName = rs.getString("option_name");
 						if (optName != null) {
 							MenuOptionDTO opt = new MenuOptionDTO();
@@ -105,7 +108,7 @@ public class HistoryServlet extends HttpServlet {
 					}
 					historyList = new ArrayList<>(itemMap.values());
 
-					// 合計金額の計算（商品価格＋オプション価格の合計 × 数量）
+					// 合計金額の計算
 					for (OrderItem oi : historyList) {
 						int itemPriceSum = oi.getPrice();
 						for (MenuOptionDTO o : oi.getSelectedOptions()) {
@@ -130,7 +133,7 @@ public class HistoryServlet extends HttpServlet {
 		/*━━━━━━━━━━━━━━━━━━━━━
 		 * 4. JSPへデータを渡す
 		 *━━━━━━━━━━━━━━━━━━━━━*/
-		request.setAttribute("orderItems", historyList); // JSP側の c:forEach items="${orderItems}" に合わせる
+		request.setAttribute("orderItems", historyList);
 		request.setAttribute("totalAmount", totalAmount);
 		request.setAttribute("nutritionData", nutritionData);
 		request.setAttribute("tableNo", tableNo);

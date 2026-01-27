@@ -43,15 +43,14 @@ public class CheckServlet extends HttpServlet {
 		int tableNo = 0;
 
 		try (Connection conn = DBManager.getConnection()) {
+			// ★ 修正：m.image は BLOB なので取得対象から外しました
 			String sql = """
 					SELECT
 					    o.order_id, o.table_no,
 					    oi.order_item_id, oi.menu_id, oi.goods_name, oi.price, oi.quantity,
-					    m.image,
 					    oio.option_name, oio.option_price
 					FROM orders o
 					JOIN order_items oi ON o.order_id = oi.order_id
-					LEFT JOIN menus m ON oi.menu_id = m.menu_id
 					LEFT JOIN order_item_options oio ON oi.order_item_id = oio.order_item_id
 					WHERE o.order_id = ? AND o.status = 'NEW'
 					ORDER BY oi.order_item_id ASC
@@ -68,11 +67,17 @@ public class CheckServlet extends HttpServlet {
 							item = new OrderItem();
 							item.setOrderId(rs.getInt("order_id"));
 							item.setOrderItemId(itemId);
+
+							// ★ 重要：GetImageServlet?id=${item.menuId} で使うため
 							item.setMenuId(rs.getString("menu_id"));
+
 							item.setName(rs.getString("goods_name"));
 							item.setPrice(rs.getInt("price"));
 							item.setQuantity(rs.getInt("quantity"));
-							item.setImage(rs.getString("image"));
+
+							// ★ 修正：rs.getString("image") によるエラーを回避するため削除
+							item.setImage(null);
+
 							item.setSelectedOptions(new ArrayList<>());
 							tableNo = rs.getInt("table_no");
 							itemMap.put(itemId, item);
@@ -92,7 +97,7 @@ public class CheckServlet extends HttpServlet {
 				}
 			}
 
-			// ★ 未提供の商品があるかチェック（DAOを使用）
+			// 未提供の商品があるかチェック
 			KitchenOrderDAO kitchenDao = new KitchenOrderDAO();
 			boolean hasUnfinished = kitchenDao.hasUnfinishedItems((long) orderId);
 			request.setAttribute("hasUnfinished", hasUnfinished);

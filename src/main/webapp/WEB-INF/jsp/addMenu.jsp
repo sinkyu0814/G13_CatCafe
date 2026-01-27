@@ -75,11 +75,10 @@
 								<td class="right">${menu.price}円</td>
 								<td class="center">${menu.quantity}</td>
 								<td class="center"><span class="badge">${menu.category}</span></td>
-								<td class="center"><c:if test="${not empty menu.img}">
-										<img
-											src="${pageContext.request.contextPath}/assets/images/${menu.img}"
-											class="thumb">
-									</c:if></td>
+								<td class="center">
+									<%-- ★ 修正：GetImageServlet経由でIDを指定して画像を表示 --%> <img
+									src="GetImageServlet?id=${menu.id}" class="thumb" alt="商品画像">
+								</td>
 								<td>
 									<div class="action-btns">
 										<form action="ToggleMenuServlet" method="post">

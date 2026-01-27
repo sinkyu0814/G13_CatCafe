@@ -36,16 +36,11 @@
 					<tbody>
 						<c:forEach var="item" items="${orderItems}">
 							<tr>
-								<td class="td-img"><c:choose>
-										<c:when test="${not empty item.image}">
-											<img
-												src="${pageContext.request.contextPath}/assets/images/${item.image}"
-												class="history-img">
-										</c:when>
-										<c:otherwise>
-											<div class="no-img">No Image</div>
-										</c:otherwise>
-									</c:choose></td>
+								<td class="td-img">
+									<%-- ★ 修正：item.menuId を使ってDBから画像を取得 --%> <img
+									src="GetImageServlet?id=${item.menuId}" class="history-img"
+									alt="${item.name}">
+								</td>
 								<td class="td-details">
 									<div class="item-name">${item.name}</div> <c:forEach var="opt"
 										items="${item.selectedOptions}">
@@ -76,15 +71,12 @@
 						ご注文ありがとうございます。<br>内容をご確認ください。
 					</p>
 				</div>
-
 				<div class="total-price-box">
 					<span class="total-label">合計金額（税込）</span> <span
 						class="total-price-value">${totalAmount}円</span>
 				</div>
-
 				<div class="action-buttons">
 					<button class="call-button">店員を呼ぶ</button>
-
 					<form action="CheckServlet" method="GET" style="width: 100%;">
 						<button type="submit" class="checkout-button">お会計へ進む</button>
 					</form>

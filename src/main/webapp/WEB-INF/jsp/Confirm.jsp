@@ -17,9 +17,8 @@
 		<div class="content-wrapper">
 
 			<div class="product-image-area">
-				<img
-					src="${pageContext.request.contextPath}/assets/images/${menu.img}"
-					alt="${menu.name}">
+				<%-- ★ 修正：DBのバイナリを取得。DTOのフィールド名に合わせて menu.id を使用 --%>
+				<img src="GetImageServlet?id=${menu.id}" alt="${menu.name}">
 			</div>
 
 			<div class="product-details-area">
@@ -29,10 +28,8 @@
 				</p>
 				<p class="product-category">カテゴリ：${menu.category}</p>
 
-				<%-- ★onsubmitを追加し、JSでバリデーションを行うように修正 --%>
 				<form action="CartAddServlet" method="post" class="add-to-cart-form"
 					onsubmit="return validateMorningOption()">
-					<%-- 商品IDとカテゴリ情報をhiddenで送信 --%>
 					<input type="hidden" name="id" value="${menu.id}"> <input
 						type="hidden" name="category" value="${param.category}">
 
@@ -48,7 +45,6 @@
 					<c:if test="${not empty options}">
 						<h4 class="option-title">
 							オプション（トッピング）
-							<%-- ★モーニングの時だけ「必須」と表示してユーザーに知らせる --%>
 							<c:if test="${menu.category == 'Morning'}">
 								<span style="color: red; font-size: 0.8em; margin-left: 10px;">【必須：1つ以上選択】</span>
 							</c:if>
@@ -75,25 +71,18 @@
 		</div>
 	</div>
 
-	<%-- ★ モーニング専用のオプションチェックJS --%>
 	<script>
 		function validateMorningOption() {
-			// JSPのEL式を使って、サーバー側のカテゴリ名を取得
 			const category = "${menu.category}";
-
-			// モーニングカテゴリの場合のみチェックを実行
 			if (category === "Morning") {
-				// name="optionIds" を持つチェックボックスの中から、チェックされているものを取得
 				const selectedOptions = document
 						.querySelectorAll('input[name="optionIds"]:checked');
-
-				// 1つも選ばれていない場合
 				if (selectedOptions.length === 0) {
 					alert("モーニングをご注文の場合は、セット内容（トッピングなど）を必ず1つ以上選択してください。");
-					return false; // formの送信をキャンセル
+					return false;
 				}
 			}
-			return true; // 送信を実行
+			return true;
 		}
 	</script>
 

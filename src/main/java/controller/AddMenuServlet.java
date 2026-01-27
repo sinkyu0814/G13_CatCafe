@@ -1,11 +1,7 @@
 package controller;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import database.MenuDAO;
@@ -25,7 +21,6 @@ import model.service.MenuService;
 @WebServlet("/AddMenuServlet")
 public class AddMenuServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final String UPLOAD_DIR = "/assets/images/";
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -36,7 +31,7 @@ public class AddMenuServlet extends HttpServlet {
 			response.sendRedirect("LoginServlet");
 			return;
 		}
-		// ★ メニュー一覧取得
+
 		MenuService service = new MenuService();
 		List<MenuDTO> menuList = service.getMenuList("all");
 		request.setAttribute("menuList", menuList);
@@ -62,10 +57,8 @@ public class AddMenuServlet extends HttpServlet {
 			String priceStr = request.getParameter("price");
 			String quantityStr = request.getParameter("quantity");
 
-			if (name == null || name.isEmpty()
-					|| priceStr == null || priceStr.isEmpty()
+			if (name == null || name.isEmpty() || priceStr == null || priceStr.isEmpty()
 					|| quantityStr == null || quantityStr.isEmpty()) {
-
 				request.setAttribute("error", "必須項目を入力してください");
 				doGet(request, response);
 				return;
@@ -74,35 +67,26 @@ public class AddMenuServlet extends HttpServlet {
 			int price = Integer.parseInt(priceStr);
 			int quantity = Integer.parseInt(quantityStr);
 
-			// --- 画像処理 ---
+			// --- 画像処理：DB保存版 ---
 			Part filePart = request.getPart("image");
-			String fileName = null;
+			InputStream imageStream = null;
 
 			if (filePart != null && filePart.getSize() > 0) {
-				String original = filePart.getSubmittedFileName();
-				String timestamp = LocalDateTime.now()
-						.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-				fileName = timestamp + "_" + original;
-
-				String uploadPath = getServletContext().getRealPath(UPLOAD_DIR);
-				File dir = new File(uploadPath);
-				if (!dir.exists())
-					dir.mkdirs();
-
-				try (InputStream in = filePart.getInputStream()) {
-					Files.copy(in, new File(dir, fileName).toPath());
-				}
+				// ファイルとして保存せず、ストリームとして取得するだけ
+				imageStream = filePart.getInputStream();
 			}
 
 			MenuDAO dao = new MenuDAO();
-			dao.addMenu(name, price, quantity, category, fileName);
+			// DAOのメソッドにInputStreamを渡す（DAO側も修正が必要）
+			dao.addMenu(name, price, quantity, category, imageStream);
 
-			request.setAttribute("success", "メニューを追加しました");
+			request.setAttribute("success", "メニューをDBに登録しました");
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			request.setAttribute("error", "登録に失敗しました");
 		}
 
-		doGet(request, response); // ★ 必ず一覧再表示
+		doGet(request, response);
 	}
 }

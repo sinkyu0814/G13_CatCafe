@@ -12,9 +12,7 @@
 
 <script>
 	function confirmCheckout() {
-		// ★ 整合性修正：EL式を一行にまとめ、JSが正しく真偽値を判定できるようにしました
 		const hasUnfinished = ${not empty hasUnfinished && hasUnfinished ? "true" : "false"};
-
 		if (hasUnfinished) {
 			return confirm("まだ提供されていない商品がありますが、会計を確定してもよろしいですか？");
 		} else {
@@ -50,16 +48,11 @@
 					<tbody>
 						<c:forEach var="item" items="${items}">
 							<tr>
-								<td class="td-img"><c:choose>
-										<c:when test="${not empty item.image}">
-											<img
-												src="${pageContext.request.contextPath}/assets/images/${item.image}"
-												class="checkout-img">
-										</c:when>
-										<c:otherwise>
-											<div class="no-img">No Image</div>
-										</c:otherwise>
-									</c:choose></td>
+								<td class="td-img">
+									<%-- ★ 修正：item.menuId を使ってGetImageServletから取得 --%> <img
+									src="GetImageServlet?id=${item.menuId}" class="checkout-img"
+									alt="${item.name}">
+								</td>
 								<td class="td-details"><strong class="item-name">${item.name}</strong>
 									<ul class="option-list">
 										<c:forEach var="opt" items="${item.selectedOptions}">
