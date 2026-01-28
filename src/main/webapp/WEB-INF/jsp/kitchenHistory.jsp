@@ -13,46 +13,50 @@
 
 	<p>
 		<button class="btn-return"
-			onclick="location.href='KitchenOrderServlet'">キッチン画面に戻る</button>
+			onclick="location.href='KitchenOrderServlet'">← キッチン画面に戻る</button>
 	</p>
 
 	<table>
 		<thead>
 			<tr>
-				<th>卓</th>
+				<th width="80" class="center">卓</th>
 				<th>商品名</th>
-				<th>数量</th>
-				<th>操作</th>
+				<th width="80" class="center">数量</th>
+				<th width="280" class="center">操作</th>
 			</tr>
 		</thead>
 		<tbody>
 			<c:forEach var="h" items="${history}">
 				<tr>
-					<td class="center">${h.tableNo}</td>
-					<td>${h.goodsName}</td>
+					<td class="center" style="font-size: 1.2rem;">${h.tableNo}</td>
+					<td style="font-weight: bold;">${h.goodsName}</td>
 					<td class="center">${h.quantity}</td>
 					<td class="center">
 						<form action="KitchenHistoryServlet" method="post">
 							<input type="hidden" name="orderItemId" value="${h.orderItemId}">
 							<button type="submit" name="action" value="back" class="btn-back">キッチンに戻す</button>
 							<button type="submit" name="action" value="delete"
-								class="btn-delete" onclick="return confirm('履歴を削除しますか？')">削除</button>
+								class="btn-delete" onclick="return confirm('この履歴を削除しますか？')">削除</button>
 						</form>
 					</td>
 				</tr>
 			</c:forEach>
 			<c:if test="${empty history}">
 				<tr>
-					<td colspan="4" class="center">履歴はありません。</td>
+					<td colspan="4" class="center" style="padding: 40px; color: #999;">履歴はありません。</td>
 				</tr>
 			</c:if>
 		</tbody>
 	</table>
 
-	<form action="KitchenHistoryServlet" method="post"
-		onsubmit="return confirm('全ての履歴を完全に削除しますか？');">
-		<input type="hidden" name="action" value="deleteAll">
-		<button type="submit" class="btn-delete-all">全履歴を削除</button>
-	</form>
+	<div class="footer-actions">
+		<p
+			style="color: var(--danger-red); font-weight: bold; margin-bottom: 10px;">【管理者エリア】</p>
+		<form action="KitchenHistoryServlet" method="post"
+			onsubmit="return confirm('注意：全ての履歴を完全に削除します。この操作は取り消せません。');">
+			<input type="hidden" name="action" value="deleteAll">
+			<button type="submit" class="btn-delete-all">全履歴を一括削除する</button>
+		</form>
+	</div>
 </body>
 </html>

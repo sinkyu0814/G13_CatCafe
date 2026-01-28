@@ -1,70 +1,116 @@
-/* AdminDashboard.jsp 専用スタイル */
-body {
-	font-family: "Helvetica Neue", Arial, sans-serif;
-	text-align: center;
-	margin: 0;
-	padding: 20px;
-	background-color: #ffffff;
+:root {
+	--primary-color: #2c3e50;
+	/* 深みのあるネイビー */
+	--accent-color: #3498db;
+	/* 清潔感のあるブルー */
+	--bg-color: #f4f7f6;
+	--text-color: #333;
+	--disabled-color: #bdc3c7;
 }
 
-/* 時計部分のコンテナ */
+body {
+	font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	background-color: var(--bg-color);
+	color: var(--text-color);
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-height: 100vh;
+}
+
+/* 時計セクション */
 .clock-outer-container {
-	border: 2px solid #3498db;
-	padding: 40px;
-	margin: 20px auto;
+	background-color: #fff;
+	border-top: 5px solid var(--primary-color);
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+	padding: 30px;
+	margin: 40px auto 20px;
 	width: 90%;
 	max-width: 800px;
-	text-align: left;
+	border-radius: 8px;
+	position: relative;
 }
 
 .home-label {
-	background-color: #ccc;
-	padding: 2px 10px;
+	position: absolute;
+	top: -15px;
+	left: 20px;
+	background-color: var(--primary-color);
+	color: white;
+	padding: 5px 20px;
 	font-size: 14px;
-	border: 1px solid #999;
-}
-
-/* デジタル時計ボックス */
-.clock-box {
-	background-color: #dcdcdc;
-	display: inline-block;
-	padding: 20px 40px;
-	margin-top: 20px;
-	font-size: 80px;
-	font-family: "Courier New", Courier, monospace;
-	letter-spacing: 15px;
 	font-weight: bold;
-	color: #000;
-	min-width: 250px;
+	border-radius: 4px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.clock-box {
+	display: block;
+	font-size: 90px;
+	font-family: "Impact", sans-serif;
+	color: var(--primary-color);
 	text-align: center;
+	letter-spacing: 5px;
+	margin: 10px 0;
 }
 
+/* 格言エリア */
 .quote-text {
-	font-size: 32px;
-	margin: 40px 0;
+	font-size: 24px;
+	font-style: italic;
+	color: #7f8c8d;
+	margin: 30px 0;
+	font-family: "Georgia", serif;
+	position: relative;
 }
 
-/* ボタンのレイアウト */
+.quote-text::before,
+.quote-text::after {
+	content: '"';
+	font-size: 40px;
+	color: var(--accent-color);
+	opacity: 0.5;
+}
+
+/* ボタンレイアウト */
 .button-grid {
 	display: grid;
-	grid-template-columns: repeat(2, 220px);
-	gap: 20px;
+	grid-template-columns: repeat(2, 280px);
+	/* 少し幅を広げてゆとりを */
+	gap: 25px;
 	justify-content: center;
-	margin-bottom: 40px;
+	margin: 20px 0 50px;
 }
 
 .button-grid button,
 .button-grid input[type="submit"] {
 	width: 100%;
-	padding: 15px;
-	font-size: 18px;
-	background-color: #dcdcdc;
-	border: 1px solid #bbb;
+	height: 80px;
+	/* 高さを揃えて押しやすく */
+	font-size: 20px;
+	font-weight: bold;
+	background-color: #fff;
+	border: 2px solid var(--primary-color);
+	border-radius: 10px;
+	color: var(--primary-color);
 	cursor: pointer;
-	color: #333;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.button-grid button:hover:not(:disabled),
+.button-grid input[type="submit"]:hover {
+	background-color: var(--primary-color);
+	color: #fff;
+	transform: translateY(-3px);
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .button-grid button:disabled {
-	opacity: 0.6;
+	background-color: #ecf0f1;
+	border-color: var(--disabled-color);
+	color: var(--disabled-color);
 	cursor: not-allowed;
+	box-shadow: none;
 }

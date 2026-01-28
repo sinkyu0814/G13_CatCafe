@@ -22,6 +22,18 @@
 		}
 	}
 </script>
+<style>
+/* 会計依頼済みのスタイル */
+.requested-msg {
+	background-color: #f8d7da;
+	color: #721c24;
+	padding: 15px;
+	border-radius: 5px;
+	text-align: center;
+	font-weight: bold;
+	margin-top: 10px;
+}
+</style>
 </head>
 <body>
 	<div class="container">
@@ -45,8 +57,7 @@
 				<table class="item-list-table">
 					<thead>
 						<tr>
-							<th><fmt:message key="label.item_name" /></th>
-							<th><fmt:message key="label.details" /></th>
+							<th colspan="2"><fmt:message key="label.item_name" /></th>
 							<th><fmt:message key="label.unit_price" /></th>
 							<th><fmt:message key="label.quantity" /></th>
 						</tr>
@@ -96,13 +107,25 @@
 							key="label.unit_table" /></span> <span class="tax-label"><fmt:message
 							key="label.tax_incl" /></span>
 				</div>
-				<form action="CheckoutServlet" method="POST" class="action-buttons">
-					<input type="hidden" name="orderId" value="${orderId}">
-					<button type="submit" class="complete-button"
-						onclick="return confirmCheckout()">
-						<fmt:message key="button.confirm_accounting" />
-					</button>
-				</form>
+
+				<%-- 会計ステータスによってボタンを切り替える --%>
+				<c:choose>
+					<c:when test="${status == 'CHECKOUT_REQUEST'}">
+						<div class="requested-msg">
+							<fmt:message key="msg.requested_checkout" />
+						</div>
+					</c:when>
+					<c:otherwise>
+						<%-- ★ 送信先を CheckServlet に変更することで、doPostの更新処理を動かします --%>
+						<form action="CheckServlet" method="POST" class="action-buttons">
+							<input type="hidden" name="orderId" value="${orderId}">
+							<button type="submit" class="complete-button"
+								onclick="return confirmCheckout()">
+								<fmt:message key="button.confirm_accounting" />
+							</button>
+						</form>
+					</c:otherwise>
+				</c:choose>
 			</aside>
 		</div>
 	</div>

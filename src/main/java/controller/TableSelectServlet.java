@@ -23,38 +23,36 @@ import model.service.MenuService;
 public class TableSelectServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	public TableSelectServlet() {
-		super();
-	}
-
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
 		HttpSession session = request.getSession(true);
 		if (session.getAttribute("isLoggedIn") == null) {
-			String uri = request.getRequestURI();
-			String query = request.getQueryString();
-			String target = (query == null) ? uri : uri + "?" + query;
-			session.setAttribute("targetURI", target);
 			response.sendRedirect("LoginServlet");
 			return;
 		}
 
-		// ★ 修正点：AccountingServletから送られてきたエラーメッセージを取得
 		String error = (String) session.getAttribute("tableSelectError");
 		if (error != null) {
 			request.setAttribute("error", error);
 			session.removeAttribute("tableSelectError");
 		}
 
+		// テーブル番号をキーに、ステータスを保存するMap
+		Map<Integer, String> tableStatusMap = new HashMap<>();
+		// テーブル番号をキーに、人数を保存するMap
 		Map<Integer, Integer> tablePersonsMap = new HashMap<>();
+
 		try (Connection conn = DBManager.getConnection()) {
-			String sql = "SELECT table_no, persons FROM orders WHERE status = 'NEW'";
+			// ★ status も取得。NEW（食事中）と CHECKOUT_REQUEST（会計待ち）を対象にする
+			String sql = "SELECT table_no, persons, status FROM orders WHERE status IN ('NEW', 'CHECKOUT_REQUEST')";
 			try (PreparedStatement ps = conn.prepareStatement(sql);
 					ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
-					tablePersonsMap.put(rs.getInt("table_no"), rs.getInt("persons"));
+					int tNo = rs.getInt("table_no");
+					tablePersonsMap.put(tNo, rs.getInt("persons"));
+					tableStatusMap.put(tNo, rs.getString("status"));
 				}
 			}
 		} catch (Exception e) {
@@ -62,16 +60,13 @@ public class TableSelectServlet extends HttpServlet {
 		}
 
 		request.setAttribute("tablePersonsMap", tablePersonsMap);
-
-		String category = request.getParameter("category");
-		if (category == null)
-			category = "all";
+		request.setAttribute("tableStatusMap", tableStatusMap); // ★追加
 
 		MenuService service = new MenuService();
 		List<String> catList = service.getCategoryList();
 		request.setAttribute("categoryList", catList);
 
-		List<MenuDTO> menuList = service.getMenuList(category);
+		List<MenuDTO> menuList = service.getMenuList("all");
 		request.setAttribute("menuList", menuList);
 
 		RequestDispatcher rd = request.getRequestDispatcher("WEB-INF/jsp/TableSelect.jsp");
@@ -81,11 +76,6 @@ public class TableSelectServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		HttpSession session = request.getSession(false);
-		if (session == null || session.getAttribute("isLoggedIn") == null) {
-			response.sendRedirect("LoginServlet");
-			return;
-		}
 		doGet(request, response);
 	}
 }

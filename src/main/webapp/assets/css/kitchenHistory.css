@@ -1,57 +1,119 @@
-/* kitchenHistory.jsp 専用スタイル */
-body {
-	font-family: Arial, sans-serif;
-	padding: 20px;
+:root {
+	--primary-dark: #2c3e50;
+	--accent-orange: #f39c12;
+	--danger-red: #e74c3c;
+	--safe-gray: #95a5a6;
+	--bg-color: #f8f9fa;
 }
 
-table {
-	width: 100%;
-	border-collapse: collapse;
+body {
+	font-family: "Helvetica Neue", Arial, "Hiragino Sans", sans-serif;
+	background-color: var(--bg-color);
+	margin: 0;
+	padding: 20px;
+	color: #333;
+}
+
+h2 {
+	color: var(--primary-dark);
+	border-left: 5px solid var(--accent-orange);
+	/* 履歴はオレンジのアクセント */
+	padding-left: 15px;
 	margin-bottom: 20px;
 }
 
-th,
-td {
-	padding: 12px;
-	border: 1px solid #ddd;
+/* 戻るボタン */
+.btn-return {
+	background-color: #fff;
+	color: var(--primary-dark);
+	border: 1px solid var(--primary-dark);
+	padding: 10px 20px;
+	font-weight: bold;
+	margin-bottom: 20px;
+	transition: all 0.2s;
+}
+
+.btn-return:hover {
+	background-color: var(--primary-dark);
+	color: #fff;
+}
+
+/* テーブルデザイン（メイン画面と統一） */
+table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0 5px;
+	margin-bottom: 30px;
 }
 
 th {
-	background-color: #eeeeee;
+	padding: 15px;
+	background-color: var(--primary-dark);
+	color: white;
+	text-align: left;
 }
 
-td.center {
+td {
+	padding: 15px;
+	background-color: white;
+	border-top: 1px solid #dee2e6;
+	border-bottom: 1px solid #dee2e6;
+}
+
+td:first-child {
+	border-left: 1px solid #dee2e6;
+	border-radius: 8px 0 0 8px;
+	font-weight: bold;
+}
+
+td:last-child {
+	border-right: 1px solid #dee2e6;
+	border-radius: 0 8px 8px 0;
+}
+
+.center {
 	text-align: center;
 }
 
-/* ボタンのスタイル設定 */
-button {
-	padding: 8px 16px;
-	cursor: pointer;
-	border: none;
-	border-radius: 4px;
-}
-
+/* 操作ボタン */
 .btn-back {
-	background-color: #ff9800;
+	background-color: var(--accent-orange);
 	color: white;
+	margin-right: 5px;
 }
 
 .btn-delete {
-	background-color: #f44336;
+	background-color: #fff;
+	color: var(--danger-red);
+	border: 1px solid var(--danger-red);
+}
+
+.btn-delete:hover {
+	background-color: var(--danger-red);
 	color: white;
+	/* #を消して white だけにする、または #ffffff */
+}
+
+/* 全削除ボタン：少し離して配置し、特別感を出す */
+.footer-actions {
+	margin-top: 50px;
+	padding: 20px;
+	background-color: #fff;
+	border-radius: 8px;
+	border: 1px dashed var(--danger-red);
+	text-align: center;
 }
 
 .btn-delete-all {
-	background-color: #333;
+	background-color: var(--danger-red);
 	color: white;
-	margin-top: 10px;
+	padding: 15px 30px;
+	font-size: 1rem;
+	font-weight: bold;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.btn-return {
-	margin-bottom: 20px;
-}
-
-form {
-	display: inline;
+.btn-delete-all:hover {
+	background-color: #c0392b;
+	transform: scale(1.02);
 }

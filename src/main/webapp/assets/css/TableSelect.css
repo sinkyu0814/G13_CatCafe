@@ -1,69 +1,161 @@
-/* TableSelect.jsp 専用スタイル */
+:root {
+	--empty-bg: #ffffff;
+	--empty-border: #dcdde1;
+	--occupied-bg: #3498db;
+	--checkout-bg: #e74c3c;
+	--selection-border: #f1c40f;
+	--text-main: #2c3e50;
+}
+
 body {
-	font-family: "Helvetica Neue", Arial, sans-serif;
-	background-color: #f4f7f6;
+	background-color: #ecf0f1;
+	color: var(--text-main);
+	font-family: sans-serif;
+	padding: 20px;
 }
 
-.container-center {
-	width: 800px;
-	margin: auto;
+.header-title {
+	text-align: center;
+	margin-bottom: 20px;
 }
 
+/* 凡例のデザイン */
+.legend-container {
+	display: flex;
+	justify-content: center;
+	gap: 25px;
+	margin-bottom: 25px;
+	background: white;
+	padding: 12px;
+	border-radius: 10px;
+}
+
+.dot {
+	height: 16px;
+	width: 16px;
+	border-radius: 4px;
+	display: inline-block;
+	margin-right: 8px;
+}
+
+.empty-dot {
+	background-color: var(--empty-bg);
+	border: 1px solid var(--empty-border);
+}
+
+.occupied-dot {
+	background-color: var(--occupied-bg);
+}
+
+.checkout-dot {
+	background-color: var(--checkout-bg);
+}
+
+.refresh-status {
+	text-align: right;
+	max-width: 900px;
+	margin: 0 auto 10px;
+	font-size: 0.85rem;
+	color: #7f8c8d;
+}
+
+/* テーブルの配置 */
 .table-layout {
 	display: grid;
 	grid-template-columns: repeat(5, 1fr);
-	gap: 10px;
-	width: 800px;
-	margin: 50px auto;
+	gap: 15px;
+	max-width: 900px;
+	margin: 0 auto;
 }
 
 .table-unit {
-	background-color: #e0e0e0;
-	padding: 20px;
+	border-radius: 12px;
+	padding: 25px 5px;
 	text-align: center;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 	cursor: pointer;
-	border: 2px solid transparent;
-	font-size: 1.2em;
-	transition: background-color 0.2s;
+	transition: all 0.2s ease;
+	border: 3px solid transparent;
 }
 
-.table-unit:hover {
-	background-color: #d0d0d0;
+.table-unit.empty {
+	background-color: var(--empty-bg);
+	color: #bdc3c7;
+	border: 1px solid var(--empty-border);
 }
 
-.table-unit.selected {
-	border: 2px solid #3498db;
-	background-color: #c0e0f0;
+.table-unit.occupied {
+	background-color: var(--occupied-bg);
+	color: white;
 }
 
-.status {
-	margin-top: 5px;
-	font-size: 0.9em;
-	color: #333;
+.table-unit.checkout-request {
+	background-color: var(--checkout-bg);
+	color: white;
+	animation: pulse 1.5s infinite;
+}
+
+/* 選択時の強調 */
+.selected-table {
+	border-color: var(--selection-border) !important;
+	transform: scale(1.05);
+	z-index: 10;
+}
+
+.table-number {
+	font-size: 1.4rem;
+	font-weight: bold;
+	display: block;
+}
+
+.status-label {
+	margin-top: 8px;
+	font-size: 1rem;
+	font-weight: bold;
+}
+
+@keyframes pulse {
+	0% {
+		transform: scale(1);
+	}
+
+	50% {
+		transform: scale(1.03);
+		box-shadow: 0 0 15px rgba(231, 76, 60, 0.6);
+	}
+
+	100% {
+		transform: scale(1);
+	}
 }
 
 .btn-container {
 	text-align: center;
-	margin-top: 20px;
+	margin-top: 30px;
 }
 
-button {
-	padding: 10px 20px;
-	margin: 5px;
+.btn-submit {
+	background-color: #27ae60;
+	color: white;
+	font-size: 1.2rem;
+	font-weight: bold;
+	padding: 15px 60px;
+	border: none;
+	border-radius: 30px;
 	cursor: pointer;
 }
 
 .admin-section {
+	margin-top: 40px;
 	text-align: center;
-	margin-top: 30px;
-	padding: 20px;
 	border-top: 1px dashed #ccc;
+	padding-top: 20px;
 }
 
 .btn-reset {
-	background-color: #e74c3c;
+	background-color: #95a5a6;
 	color: white;
 	border: none;
-	padding: 10px 20px;
+	padding: 8px 15px;
 	border-radius: 5px;
 }

@@ -4,23 +4,21 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>店舗管理システム</title>
+<title>店舗管理システム | DASHBOARD</title>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/AdminDashboard.css">
 </head>
 <body>
 
 	<div class="clock-outer-container">
-		<span class="home-label">ホーム</span>
-		<div style="text-align: left; margin-left: 20px;">
-			<div id="realTimeClock" class="clock-box">00:00</div>
-		</div>
+		<span class="home-label">ADMIN HOME</span>
+		<div id="realTimeClock" class="clock-box">00:00</div>
 	</div>
 
 	<div class="quote-text">An eye for an eye, a tooth for a tooth</div>
 
 	<div class="button-grid">
-		<button disabled>勤怠画面</button>
+		<button disabled>勤怠管理</button>
 
 		<form action="SalesServlet" method="get">
 			<input type="submit" value="売上管理">

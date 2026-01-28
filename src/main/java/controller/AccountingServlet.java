@@ -44,6 +44,7 @@ public class AccountingServlet extends HttpServlet {
 		int tableNo = 0;
 
 		try (Connection conn = DBManager.getConnection()) {
+			// ★ status が NEW または CHECKOUT_REQUEST のものを表示
 			String sql = """
 					SELECT o.table_no,
 					       oi.order_item_id,
@@ -55,7 +56,7 @@ public class AccountingServlet extends HttpServlet {
 					FROM orders o
 					JOIN order_items oi ON o.order_id = oi.order_id
 					LEFT JOIN order_item_options oio ON oi.order_item_id = oio.order_item_id
-					WHERE o.order_id = ? AND o.status = 'NEW'
+					WHERE o.order_id = ? AND o.status IN ('NEW', 'CHECKOUT_REQUEST')
 					ORDER BY oi.order_item_id ASC
 					""";
 
@@ -123,7 +124,8 @@ public class AccountingServlet extends HttpServlet {
 			int tableNo = Integer.parseInt(tableStr.replace("番", ""));
 
 			try (Connection conn = DBManager.getConnection()) {
-				String sql = "SELECT order_id FROM orders WHERE table_no = ? AND status = 'NEW'";
+				// ★ 会計待ちはどちらのステータスでも開始できるようにする
+				String sql = "SELECT order_id FROM orders WHERE table_no = ? AND status IN ('NEW', 'CHECKOUT_REQUEST')";
 				try (PreparedStatement ps = conn.prepareStatement(sql)) {
 					ps.setInt(1, tableNo);
 					try (ResultSet rs = ps.executeQuery()) {
@@ -143,14 +145,10 @@ public class AccountingServlet extends HttpServlet {
 			return;
 		}
 
-		// --- 会計確定処理 ---
+		// 会計確定
 		Integer orderId = (Integer) session.getAttribute("orderId");
 		Integer tableNo = (Integer) session.getAttribute("tableNo");
 
-		if (orderId == null)
-			throw new ServletException("会計対象なし");
-
-		// ★ ここが重要：JSPから送られてくる金額と預かり金を取得して計算する
 		String totalStr = request.getParameter("totalAmount");
 		String depositStr = request.getParameter("deposit");
 
@@ -159,6 +157,7 @@ public class AccountingServlet extends HttpServlet {
 		int change = deposit - totalAmount;
 
 		try (Connection conn = DBManager.getConnection()) {
+			// ステータスをPAIDにする
 			String sql = "UPDATE orders SET status = 'PAID' WHERE order_id = ?";
 			try (PreparedStatement ps = conn.prepareStatement(sql)) {
 				ps.setInt(1, orderId);
@@ -168,20 +167,14 @@ public class AccountingServlet extends HttpServlet {
 			throw new ServletException(e);
 		}
 
-		// ★ 重要：JSPで表示するために request にセットする
-		// これを忘れると AccountingComplete.jsp で null になります
 		request.setAttribute("tableNo", tableNo);
 		request.setAttribute("totalAmount", totalAmount);
 		request.setAttribute("deposit", deposit);
 		request.setAttribute("change", change);
 
-		// ★ 重要：セッションを消去する前に、必要なデータ（上記）はリクエストに移したので安全です
 		session.removeAttribute("orderId");
-		session.removeAttribute("isPaid");
-		session.removeAttribute("persons");
 		session.removeAttribute("tableNo");
 
-		// 完了画面へ
 		request.getRequestDispatcher("/WEB-INF/jsp/AccountingComplete.jsp").forward(request, response);
 	}
 }
