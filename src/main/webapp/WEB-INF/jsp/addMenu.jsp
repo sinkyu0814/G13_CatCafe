@@ -75,12 +75,15 @@
 								<td class="right">${menu.price}円</td>
 								<td class="center">${menu.quantity}</td>
 								<td class="center"><span class="badge">${menu.category}</span></td>
-								<td class="center">
-									<%-- ★ 修正：GetImageServlet経由でIDを指定して画像を表示 --%> <img
-									src="GetImageServlet?id=${menu.id}" class="thumb" alt="商品画像">
-								</td>
+								<td class="center"><img src="GetImageServlet?id=${menu.id}"
+									class="thumb" alt="商品画像"></td>
 								<td>
 									<div class="action-btns">
+										<%-- ★ 修正：編集ボタンをループ内の正しい場所に配置 --%>
+										<a href="EditMenuServlet?id=${menu.id}"
+											class="btn-sm btn-info"
+											style="text-decoration: none; text-align: center; display: inline-block; line-height: 24px; margin-bottom: 5px;">編集</a>
+
 										<form action="ToggleMenuServlet" method="post">
 											<input type="hidden" name="menuId" value="${menu.id}">
 											<input type="hidden" name="visible"
@@ -89,6 +92,7 @@
 												class="btn-sm ${menu.isVisible == 1 ? 'btn-warn' : 'btn-info'}">
 												${menu.isVisible == 1 ? "非表示にする" : "表示する"}</button>
 										</form>
+
 										<form action="DeleteMenuServlet" method="post"
 											onsubmit="return confirm('メニューを削除しますか？');">
 											<input type="hidden" name="menuId" value="${menu.id}">

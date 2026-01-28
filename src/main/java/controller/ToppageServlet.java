@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Locale;
 
 import database.DBManager;
 import jakarta.servlet.ServletException;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.jsp.jstl.core.Config;
 
 @WebServlet("/ToppageServlet")
 public class ToppageServlet extends HttpServlet {
@@ -20,13 +22,9 @@ public class ToppageServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		HttpSession session = request.getSession(false);
-
 		if (session != null) {
-			// ★ ガード：未会計の注文（orderId）がある間は、人数入力画面を表示させない
 			if (session.getAttribute("orderId") != null) {
-				// 会計前なら注文リストへ、会計受付後なら完了画面へ引き戻す
 				if (session.getAttribute("isPaid") != null) {
 					request.getRequestDispatcher("/WEB-INF/jsp/AccountingComplete.jsp").forward(request, response);
 				} else {
@@ -35,8 +33,6 @@ public class ToppageServlet extends HttpServlet {
 				return;
 			}
 		}
-
-		// 注文がない（会計が完全に終わった）状態の時だけ、人数入力画面を表示
 		request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp").forward(request, response);
 	}
 
@@ -45,10 +41,18 @@ public class ToppageServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		request.setCharacterEncoding("UTF-8");
-		String personsStr = request.getParameter("persons");
 		HttpSession session = request.getSession();
 
-		// 二重注文防止ガード
+		// ★ 言語設定の処理を追加
+		String lang = request.getParameter("lang");
+		if (lang != null && !lang.isEmpty()) {
+			Locale locale = new Locale(lang);
+			// JSTLのfmtタグが使用するロケールをセッションに固定する
+			Config.set(session, Config.FMT_LOCALE, locale);
+		}
+
+		String personsStr = request.getParameter("persons");
+
 		if (session.getAttribute("orderId") != null) {
 			response.sendRedirect("ToppageServlet");
 			return;

@@ -1,41 +1,37 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<fmt:setBundle basename="messages" />
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ご来店ありがとうございます</title>
+<title><fmt:message key="label.welcome" /></title>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/FirstWindow.css">
 <script>
 	let activeInput = null;
-
 	function setActive(id) {
-		// activeクラスの付け替え
 		document.getElementById('persons').classList.remove('active-field');
 		activeInput = document.getElementById(id);
 		activeInput.classList.add('active-field');
 	}
-
 	function press(num) {
 		if (!activeInput)
 			return;
 		activeInput.value += num;
 	}
-
 	function clearInput() {
 		if (activeInput)
 			activeInput.value = "";
 	}
-
 	function backspace() {
 		if (!activeInput)
 			return;
 		activeInput.value = activeInput.value.slice(0, -1);
 	}
-
 	window.onload = function() {
 		setActive('persons');
 	};
@@ -45,26 +41,41 @@
 <body>
 	<div class="container">
 		<header class="welcome-header">
-			<h1 class="shop-name">ねこまるカフェ</h1>
+			<%-- 言語選択セレクトボックス --%>
+			<div class="lang-switcher"
+				style="text-align: right; margin-bottom: 10px;">
+				<select name="lang" form="orderForm"
+					style="padding: 5px; border-radius: 5px; cursor: pointer;">
+					<option value="ja">日本語 / Japanese</option>
+					<option value="en">English / 英語</option>
+				</select>
+			</div>
+
+			<h1 class="shop-name">
+				<fmt:message key="label.shop_name" />
+			</h1>
 			<p class="welcome-msg">
-				いらっしゃいませ！<br>ご来店人数を入力してください。
+				<fmt:message key="label.welcome" />
+				<br>
+				<fmt:message key="label.enter_persons" />
 			</p>
 		</header>
 
 		<form action="ToppageServlet" method="post" class="input-form"
-			onsubmit="return checkSpecialCode(event)">
+			id="orderForm">
 			<div class="input-area">
 				<div class="input-group">
-					<label for="persons">ご来店人数</label>
+					<label for="persons"><fmt:message key="label.persons" /></label>
 					<div class="field-wrapper" id="wrapper-persons">
 						<input type="text" name="persons" id="persons" readonly
 							onclick="setActive('persons')" value="${param.persons}"
-							placeholder="0"> <span class="unit">名様</span>
+							placeholder="0"> <span class="unit"><fmt:message
+								key="label.unit_persons" /></span>
 					</div>
 				</div>
 
 				<div class="input-group display-only">
-					<label>テーブル番号</label>
+					<label><fmt:message key="label.table_no" /></label>
 					<div class="field-wrapper readonly-wrapper">
 						<input type="text" value="${sessionScope.fixedTableNo}" readonly
 							placeholder="未設定"> <span class="unit">番</span>
@@ -89,8 +100,9 @@
 					<button type="button" onclick="press(0)">0</button>
 					<button type="button" class="btn-back" onclick="backspace()">←</button>
 				</div>
-
-				<button type="submit" class="start-button">注文を開始する</button>
+				<button type="submit" class="start-button">
+					<fmt:message key="label.start_order" />
+				</button>
 			</div>
 		</form>
 

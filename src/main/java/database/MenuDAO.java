@@ -182,4 +182,32 @@ public class MenuDAO {
 			}
 		}
 	}
+
+	public void updateMenu(int id, String name, int price, int quantity, String category, InputStream imageStream)
+			throws Exception {
+		String sql;
+		boolean hasImage = (imageStream != null);
+
+		if (hasImage) {
+			sql = "UPDATE menus SET name=?, price=?, quantity=?, category=?, image=? WHERE menu_id=?";
+		} else {
+			sql = "UPDATE menus SET name=?, price=?, quantity=?, category=? WHERE menu_id=?";
+		}
+
+		try (Connection conn = DBManager.getConnection();
+				PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setString(1, name);
+			ps.setInt(2, price);
+			ps.setInt(3, quantity);
+			ps.setString(4, category);
+
+			if (hasImage) {
+				ps.setBinaryStream(5, imageStream);
+				ps.setInt(6, id);
+			} else {
+				ps.setInt(5, id);
+			}
+			ps.executeUpdate();
+		}
+	}
 }
