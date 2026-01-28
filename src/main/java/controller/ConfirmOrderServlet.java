@@ -2,6 +2,8 @@ package controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import database.CartDAO;
 import jakarta.servlet.ServletException;
@@ -10,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.jsp.jstl.core.Config;
 import viewmodel.CartItem;
 
 @WebServlet("/ConfirmOrderServlet")
@@ -20,17 +23,26 @@ public class ConfirmOrderServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		request.setCharacterEncoding("UTF-8");
 		HttpSession session = request.getSession();
+
+		// -------------------------
+		// 0. 言語設定とメッセージ準備
+		// -------------------------
+		Locale locale = (Locale) Config.get(session, Config.FMT_LOCALE);
+		if (locale == null) {
+			locale = Locale.JAPANESE;
+		}
+		ResourceBundle bundle = ResourceBundle.getBundle("properties.messages", locale);
 
 		// -------------------------
 		// 1. カート取得
 		// -------------------------
 		List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
 
-		// ★例外処理：カートが空の場合、ListServletへ戻す
+		// ★例外処理：カートが空の場合（多言語対応メッセージ）
 		if (cart == null || cart.isEmpty()) {
-			request.setAttribute("error", "カートが空です。注文する商品を選んでください。");
-			// ListServletのdoGetを通るようにフォワード（メニュー再取得のため）
+			request.setAttribute("error", bundle.getString("error.cart_empty"));
 			request.getRequestDispatcher("ListServlet").forward(request, response);
 			return;
 		}
@@ -41,7 +53,7 @@ public class ConfirmOrderServlet extends HttpServlet {
 		Integer orderId = (Integer) session.getAttribute("orderId");
 
 		if (orderId == null) {
-			request.setAttribute("error", "セッションの有効期限が切れました。最初からやり直してください。");
+			request.setAttribute("error", bundle.getString("error.session_expired"));
 			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp").forward(request, response);
 			return;
 		}
@@ -54,7 +66,8 @@ public class ConfirmOrderServlet extends HttpServlet {
 			dao.insertOrderItems(orderId, cart);
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new ServletException("注文確定処理に失敗しました", e);
+			// 致命的なエラーメッセージ（必要に応じてここもbundle化可能です）
+			throw new ServletException("注文確定処理に失敗しました / Order processing failed", e);
 		}
 
 		// -------------------------

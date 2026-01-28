@@ -22,6 +22,12 @@
 	text-align: center;
 	font-weight: bold;
 }
+/* 無効化されたボタンのスタイル */
+.qty-btn:disabled {
+	background-color: #ccc;
+	cursor: not-allowed;
+	opacity: 0.5;
+}
 </style>
 </head>
 <body>
@@ -72,7 +78,6 @@
 								</div>
 								<div class="item-info">
 									<p class="item-name">${m.name}</p>
-									<%-- 単位を label.unit_table (円) に修正 --%>
 									<p class="item-price">${m.price}<fmt:message
 											key="label.unit_table" />
 									</p>
@@ -117,6 +122,7 @@
 
 						<div class="cart-qty-area"
 							style="display: flex; align-items: center; gap: 5px;">
+							<%-- マイナスボタン --%>
 							<form action="UpdateCartServlet" method="post" style="margin: 0;">
 								<input type="hidden" name="index" value="${status.index}">
 								<input type="hidden" name="change" value="-1"> <input
@@ -127,12 +133,14 @@
 
 							<span class="cart-item-qty">${c.quantity}</span>
 
+							<%-- プラスボタン：数量が10以上の場合は disabled にする --%>
 							<form action="UpdateCartServlet" method="post" style="margin: 0;">
 								<input type="hidden" name="index" value="${status.index}">
 								<input type="hidden" name="change" value="1"> <input
 									type="hidden" name="category" value="${param.category}">
 								<button type="submit" class="qty-btn"
-									style="width: 24px; height: 24px; padding: 0;">+</button>
+									style="width: 24px; height: 24px; padding: 0;"
+									${c.quantity >= 10 ? 'disabled' : ''}>+</button>
 							</form>
 						</div>
 					</div>
@@ -146,7 +154,6 @@
 					</button>
 				</form>
 
-				<%-- actionが ConfirmOrderServlet であることを再確認 --%>
 				<form action="ConfirmOrderServlet" method="post">
 					<button type="submit" class="side-btn order-btn">
 						<fmt:message key="button.order_confirm" />
