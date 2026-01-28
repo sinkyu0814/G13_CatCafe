@@ -1,44 +1,50 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
-<%@taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<fmt:setBundle basename="properties.messages" />
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>ご注文ありがとうございます</title>
+<title><fmt:message key="label.order_received" /></title>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/orderComplete.css">
 </head>
 <body>
-
 	<div class="container">
 		<div class="order-card">
 			<header class="order-header">
-				<h2>ご注文を承りました</h2>
-				<p class="order-id">注文番号：${orderId}</p>
+				<h2>
+					<fmt:message key="label.order_received" />
+				</h2>
+				<p class="order-id">
+					<fmt:message key="label.order_id" />
+					：${orderId}
+				</p>
 			</header>
-
 			<div class="order-content">
-				<h3>承った内容</h3>
+				<h3>
+					<fmt:message key="label.order_details" />
+				</h3>
 				<div class="scroll-area">
 					<ul class="order-list">
 						<c:forEach var="i" items="${orderItems}">
 							<li><span class="item-name">${i.goodsName}</span> <span
-								class="item-qty">× ${i.quantity}</span> <span class="item-total">${i.totalPrice}円</span>
-							</li>
+								class="item-qty">× ${i.quantity}</span> <span class="item-total">${i.totalPrice}<fmt:message
+										key="label.unit_table" /></span></li>
 						</c:forEach>
 					</ul>
 				</div>
 			</div>
-
 			<p class="message">
-				ただいま心を込めてお作りしております。<br>到着まで少々お待ちくださいませ。
+				<fmt:message key="label.waiting_msg" />
 			</p>
-
 			<form action="ListServlet" method="get">
-				<button class="return-button">メニューに戻る</button>
+				<button class="return-button">
+					<fmt:message key="button.back_to_menu" />
+				</button>
 			</form>
 		</div>
 	</div>
-
 </body>
 </html>

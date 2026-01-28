@@ -1,11 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<fmt:setBundle basename="properties.messages" />
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>メニュー画面</title>
+<title><fmt:message key="label.shop_name" /></title>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/menulist.css">
 <style>
@@ -28,19 +30,33 @@
 			<nav class="category-nav">
 				<form action="ListServlet" method="get">
 					<button name="category" value="Recomend"
-						class="${(empty param.category or param.category == 'Recomend') ? 'active' : ''}">おすすめ</button>
+						class="${(empty param.category or param.category == 'Recomend') ? 'active' : ''}">
+						<fmt:message key="cat.recommend" />
+					</button>
 					<button name="category" value="Cofe"
-						class="${param.category == 'Cofe' ? 'active' : ''}">珈琲</button>
+						class="${param.category == 'Cofe' ? 'active' : ''}">
+						<fmt:message key="cat.coffee" />
+					</button>
 					<button name="category" value="Tea"
-						class="${param.category == 'Tea' ? 'active' : ''}">紅茶</button>
+						class="${param.category == 'Tea' ? 'active' : ''}">
+						<fmt:message key="cat.tea" />
+					</button>
 					<button name="category" value="Eat"
-						class="${param.category == 'Eat' ? 'active' : ''}">主食</button>
+						class="${param.category == 'Eat' ? 'active' : ''}">
+						<fmt:message key="cat.main" />
+					</button>
 					<button name="category" value="Sweets"
-						class="${param.category == 'Sweets' ? 'active' : ''}">スイーツ</button>
+						class="${param.category == 'Sweets' ? 'active' : ''}">
+						<fmt:message key="cat.sweets" />
+					</button>
 					<button name="category" value="SoftDrink"
-						class="${param.category == 'SoftDrink' ? 'active' : ''}">ソフトドリンク</button>
+						class="${param.category == 'SoftDrink' ? 'active' : ''}">
+						<fmt:message key="cat.softdrink" />
+					</button>
 					<button name="category" value="Morning"
-						class="${param.category == 'Morning' ? 'active' : ''}">モーニング</button>
+						class="${param.category == 'Morning' ? 'active' : ''}">
+						<fmt:message key="cat.morning" />
+					</button>
 				</form>
 			</nav>
 
@@ -56,7 +72,10 @@
 								</div>
 								<div class="item-info">
 									<p class="item-name">${m.name}</p>
-									<p class="item-price">${m.price}円</p>
+									<%-- 単位を label.unit_table (円) に修正 --%>
+									<p class="item-price">${m.price}<fmt:message
+											key="label.unit_table" />
+									</p>
 								</div>
 							</a>
 						</div>
@@ -68,71 +87,84 @@
 
 			<div class="footer-actions">
 				<form action="CheckServlet" method="GET">
-					<button type="submit" class="checkout-main-button">会計</button>
+					<button type="submit" class="checkout-main-button">
+						<fmt:message key="button.accounting" />
+					</button>
 				</form>
 			</div>
 		</main>
 
 		<aside class="sidebar">
-			<div class="cart-header">カート</div>
+			<div class="cart-header">
+				<fmt:message key="label.cart" />
+			</div>
 			<div class="cart-content">
 				<c:if test="${empty cart and not empty error}">
 					<div class="cart-warning">${error}</div>
 				</c:if>
-				<c:if test="${not empty cart}">
-					<c:forEach var="c" items="${cart}" varStatus="status">
-						<div class="cart-row"
-							style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-							<div class="cart-info">
-								<span class="cart-item-name">${c.goodsName}</span>
-								<c:if test="${not empty c.selectedOptions}">
-									<div style="font-size: 0.75em; color: #666;">
-										<c:forEach var="opt" items="${c.selectedOptions}">+${opt.optionName}</c:forEach>
-									</div>
-								</c:if>
-							</div>
-							<div class="cart-qty-area"
-								style="display: flex; align-items: center; gap: 5px;">
-								<form action="UpdateCartServlet" method="post"
-									style="margin: 0;">
-									<input type="hidden" name="index" value="${status.index}">
-									<input type="hidden" name="change" value="-1"> <input
-										type="hidden" name="category" value="${param.category}">
-									<button type="submit" class="qty-btn"
-										style="width: 24px; height: 24px; padding: 0;">-</button>
-								</form>
-								<span class="cart-item-qty">${c.quantity}</span>
-								<form action="UpdateCartServlet" method="post"
-									style="margin: 0;">
-									<input type="hidden" name="index" value="${status.index}">
-									<input type="hidden" name="change" value="1"> <input
-										type="hidden" name="category" value="${param.category}">
-									<button type="submit" class="qty-btn"
-										style="width: 24px; height: 24px; padding: 0;">+</button>
-								</form>
-							</div>
+
+				<c:forEach var="c" items="${cart}" varStatus="status">
+					<div class="cart-row"
+						style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+						<div class="cart-info">
+							<span class="cart-item-name">${c.goodsName}</span>
+							<c:if test="${not empty c.selectedOptions}">
+								<div style="font-size: 0.75em; color: #666;">
+									<c:forEach var="opt" items="${c.selectedOptions}">+${opt.optionName}</c:forEach>
+								</div>
+							</c:if>
 						</div>
-					</c:forEach>
-				</c:if>
+
+						<div class="cart-qty-area"
+							style="display: flex; align-items: center; gap: 5px;">
+							<form action="UpdateCartServlet" method="post" style="margin: 0;">
+								<input type="hidden" name="index" value="${status.index}">
+								<input type="hidden" name="change" value="-1"> <input
+									type="hidden" name="category" value="${param.category}">
+								<button type="submit" class="qty-btn"
+									style="width: 24px; height: 24px; padding: 0;">-</button>
+							</form>
+
+							<span class="cart-item-qty">${c.quantity}</span>
+
+							<form action="UpdateCartServlet" method="post" style="margin: 0;">
+								<input type="hidden" name="index" value="${status.index}">
+								<input type="hidden" name="change" value="1"> <input
+									type="hidden" name="category" value="${param.category}">
+								<button type="submit" class="qty-btn"
+									style="width: 24px; height: 24px; padding: 0;">+</button>
+							</form>
+						</div>
+					</div>
+				</c:forEach>
 			</div>
+
 			<div class="sidebar-footer">
 				<form action="HistoryServlet" method="get">
-					<button class="side-btn">注文履歴を見る</button>
+					<button type="submit" class="side-btn">
+						<fmt:message key="button.view_history" />
+					</button>
 				</form>
+
+				<%-- actionが ConfirmOrderServlet であることを再確認 --%>
 				<form action="ConfirmOrderServlet" method="post">
-					<button class="side-btn order-btn">注文確定</button>
+					<button type="submit" class="side-btn order-btn">
+						<fmt:message key="button.order_confirm" />
+					</button>
 				</form>
 			</div>
 		</aside>
 	</div>
+
 	<script>
 		function scrollGrid(direction) {
 			const grid = document.getElementById('productGrid');
-			const scrollAmount = grid.clientWidth;
-			grid.scrollBy({
-				left : direction * scrollAmount,
-				behavior : 'smooth'
-			});
+			if (grid) {
+				grid.scrollBy({
+					left : direction * grid.clientWidth,
+					behavior : 'smooth'
+				});
+			}
 		}
 	</script>
 </body>

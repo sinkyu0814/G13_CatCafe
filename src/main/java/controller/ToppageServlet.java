@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import database.DBManager;
 import jakarta.servlet.ServletException;
@@ -43,35 +44,51 @@ public class ToppageServlet extends HttpServlet {
 		request.setCharacterEncoding("UTF-8");
 		HttpSession session = request.getSession();
 
-		// ★ 言語設定の処理を追加
+		// 1. 言語設定の処理
 		String lang = request.getParameter("lang");
+		Locale locale;
 		if (lang != null && !lang.isEmpty()) {
-			Locale locale = new Locale(lang);
-			// JSTLのfmtタグが使用するロケールをセッションに固定する
-			Config.set(session, Config.FMT_LOCALE, locale);
+			locale = new Locale(lang);
+		} else {
+			// セッションに既存のロケールがあればそれを使用、なければデフォルト
+			locale = (Locale) Config.get(session, Config.FMT_LOCALE);
+			if (locale == null)
+				locale = Locale.JAPANESE;
 		}
+		// JSTLのfmtタグ用ロケールを設定
+		Config.set(session, Config.FMT_LOCALE, locale);
+
+		// 2. プロパティファイル(messages)を読み込むための準備
+		// パッケージ名を含めて指定 (properties.messages)
+		ResourceBundle bundle = ResourceBundle.getBundle("properties.messages", locale);
 
 		String personsStr = request.getParameter("persons");
 
+		// すでに注文IDがある場合は二重登録防止のためリダイレクト
 		if (session.getAttribute("orderId") != null) {
 			response.sendRedirect("ToppageServlet");
 			return;
 		}
 
+		// --- バリデーションチェック（メッセージをプロパティから取得） ---
+
+		// 未入力チェック
 		if (personsStr == null || personsStr.isEmpty()) {
-			request.setAttribute("error", "人数を入力してください");
+			request.setAttribute("error", bundle.getString("error.enter_persons"));
 			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp").forward(request, response);
 			return;
 		}
 
+		// 管理者用テーブル設定画面への隠しコマンド
 		if ("2136".equals(personsStr)) {
 			request.getRequestDispatcher("/WEB-INF/jsp/AdminTableSet.jsp").forward(request, response);
 			return;
 		}
 
+		// テーブル番号設定チェック
 		String fixedTableNo = (String) session.getAttribute("fixedTableNo");
 		if (fixedTableNo == null || fixedTableNo.isEmpty()) {
-			request.setAttribute("error", "店員を呼んでください（テーブル未設定）");
+			request.setAttribute("error", bundle.getString("error.call_staff"));
 			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp").forward(request, response);
 			return;
 		}
@@ -81,17 +98,21 @@ public class ToppageServlet extends HttpServlet {
 			persons = Integer.parseInt(personsStr);
 			tableNo = Integer.parseInt(fixedTableNo);
 		} catch (NumberFormatException e) {
-			request.setAttribute("error", "正しい数値を入力してください");
+			request.setAttribute("error", bundle.getString("error.invalid_number"));
 			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp").forward(request, response);
 			return;
 		}
 
+		// 人数範囲チェック
 		if (persons < 1 || persons > 10) {
-			request.setAttribute("error", "人数は1～10人です");
+			request.setAttribute("error", bundle.getString("error.persons_range"));
 			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp").forward(request, response);
 			return;
 		}
 
+		// -------------------------
+		// DB登録処理
+		// -------------------------
 		session.setAttribute("persons", persons);
 		session.setAttribute("tableNo", tableNo);
 
@@ -110,6 +131,8 @@ public class ToppageServlet extends HttpServlet {
 		} catch (Exception e) {
 			throw new ServletException(e);
 		}
+
+		// 登録完了後は doGet を通して ListServlet へ
 		response.sendRedirect("ToppageServlet");
 	}
 }

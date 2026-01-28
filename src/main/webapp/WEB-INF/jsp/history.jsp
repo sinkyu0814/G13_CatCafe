@@ -1,89 +1,94 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<fmt:setBundle basename="properties.messages" />
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>注文履歴</title>
+<title><fmt:message key="label.order_history" /></title>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/history.css">
 </head>
-
 <body>
-
 	<div class="container">
 		<header class="page-header">
 			<h1>
-				注文履歴 <span class="header-info">（テーブル: ${tableNo} ／ 注文ID:
-					${orderId}）</span>
+				<fmt:message key="label.order_history" />
+				<span class="header-info">（<fmt:message key="label.table" />:
+					${tableNo} ／ <fmt:message key="label.order_id" />: ${orderId}）
+				</span>
 			</h1>
-			<button class="close-button" onclick="location.href='ListServlet'">戻る</button>
+			<button class="close-button" onclick="location.href='ListServlet'">
+				<fmt:message key="button.back" />
+			</button>
 		</header>
-
 		<div class="main-content">
 			<div class="scrollable-area">
 				<table class="item-list-table">
 					<thead>
 						<tr>
-							<th>商品</th>
-							<th>詳細</th>
-							<th>単価</th>
-							<th>数量</th>
+							<th><fmt:message key="label.item_name" /></th>
+							<th><fmt:message key="label.details" /></th>
+							<th><fmt:message key="label.unit_price" /></th>
+							<th><fmt:message key="label.quantity" /></th>
 						</tr>
 					</thead>
 					<tbody>
 						<c:forEach var="item" items="${orderItems}">
 							<tr>
-								<td class="td-img">
-									<%-- ★ 修正：item.menuId を使ってDBから画像を取得 --%> <img
-									src="GetImageServlet?id=${item.menuId}" class="history-img"
-									alt="${item.name}">
-								</td>
+								<td class="td-img"><img
+									src="GetImageServlet?id=${item.menuId}" class="history-img"></td>
 								<td class="td-details">
 									<div class="item-name">${item.name}</div> <c:forEach var="opt"
 										items="${item.selectedOptions}">
-										<div class="option-text">+ ${opt.optionName}
-											(+${opt.optionPrice}円)</div>
+										<div class="option-text">
+											+ ${opt.optionName} (+${opt.optionPrice}
+											<fmt:message key="label.unit_table" />
+											)
+										</div>
 									</c:forEach>
 								</td>
-								<td class="td-price">${item.price}円<c:if
-										test="${not empty item.selectedOptions}">
-										<div class="sub-price">(計: ${item.price + item.optionTotalPrice}円)</div>
-									</c:if>
-								</td>
-								<td class="td-qty">${item.quantity}個</td>
+								<td class="td-price">${item.price}<fmt:message
+										key="label.unit_table" />
+									<c:if test="${not empty item.selectedOptions}">
+										<div class="sub-price">
+											(計: ${item.price + item.optionTotalPrice}
+											<fmt:message key="label.unit_table" />
+											)
+										</div>
+									</c:if></td>
+								<td class="td-qty">${item.quantity}<fmt:message
+										key="label.unit_qty" /></td>
 							</tr>
 						</c:forEach>
-						<c:if test="${empty orderItems}">
-							<tr>
-								<td colspan="4" class="empty-msg">注文履歴がありません</td>
-							</tr>
-						</c:if>
 					</tbody>
 				</table>
 			</div>
-
 			<aside class="summary-container">
 				<div class="info-box">
 					<p class="info-text">
-						ご注文ありがとうございます。<br>内容をご確認ください。
+						<fmt:message key="label.waiting_msg" />
 					</p>
 				</div>
 				<div class="total-price-box">
-					<span class="total-label">合計金額（税込）</span> <span
-						class="total-price-value">${totalAmount}円</span>
+					<span class="total-label"><fmt:message
+							key="label.total_tax_incl" /></span> <span class="total-price-value">${totalAmount}<fmt:message
+							key="label.unit_table" /></span>
 				</div>
 				<div class="action-buttons">
-					<button class="call-button">店員を呼ぶ</button>
+					<button class="call-button">
+						<fmt:message key="button.call_staff" />
+					</button>
 					<form action="CheckServlet" method="GET" style="width: 100%;">
-						<button type="submit" class="checkout-button">お会計へ進む</button>
+						<button type="submit" class="checkout-button">
+							<fmt:message key="button.proceed_to_checkout" />
+						</button>
 					</form>
 				</div>
 			</aside>
 		</div>
 	</div>
-
 </body>
 </html>

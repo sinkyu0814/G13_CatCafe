@@ -1,49 +1,54 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<fmt:setBundle basename="properties.messages" />
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>お会計受付完了</title>
+<title><fmt:message key="label.thank_you" /></title>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/checkout.css">
 <script>
-    // 3秒ごとに会計状態をチェックする関数
     function checkStatus() {
-        // サーバーに「セッション(orderId)が消えたか」を確認しに行く
         fetch('${pageContext.request.contextPath}/CheckStatusServlet')
             .then(response => response.json())
             .then(data => {
                 if (data.isCleared) {
-                    // 店員が会計を確定（セッションクリア）させていたら、自動でトップページへ
                     window.location.href = '${pageContext.request.contextPath}/ToppageServlet';
                 }
             })
-            .catch(error => console.error('状態チェックエラー:', error));
+            .catch(error => console.error('Error:', error));
     }
-
-    // 画面を開いた後、3秒おきにチェックを実行
     setInterval(checkStatus, 3000);
 </script>
 </head>
 <body>
 	<div class="container">
 		<header class="header-area">
-			<div class="shop-name">ねこまるカフェ</div>
+			<div class="shop-name">
+				<fmt:message key="label.shop_name" />
+			</div>
 		</header>
 
 		<main class="main-message">
 			<div class="icon-check">✔</div>
-			<h2 class="thank-you">ご利用ありがとうございました</h2>
+			<h2 class="thank-you">
+				<fmt:message key="label.thank_you" />
+			</h2>
 			<div class="table-info">
-				<p class="table-label">お客様のテーブル番号</p>
+				<p class="table-label">
+					<fmt:message key="label.customer_table_no" />
+				</p>
 				<div class="table-number-line">
-					<span class="table-number-box">${tableNo}</span> 番
+					<span class="table-number-box">${tableNo}</span>
+					<fmt:message key="label.unit_table_no" />
 				</div>
 			</div>
 			<div class="instruction-box">
 				<p class="instruction">
-					そのままレジまでお越しください。<br> <span>お会計が完了すると画面が切り替わります。</span>
+					<fmt:message key="msg.go_to_register" />
+					<br> <span><fmt:message key="msg.screen_will_change" /></span>
 				</p>
 			</div>
 		</main>

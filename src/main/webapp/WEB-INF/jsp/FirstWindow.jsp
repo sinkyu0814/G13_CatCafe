@@ -2,7 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
-<fmt:setBundle basename="messages" />
+<fmt:setBundle basename="properties.messages" />
 <!DOCTYPE html>
 <html>
 <head>
@@ -37,20 +37,21 @@
 	};
 </script>
 </head>
-
 <body>
 	<div class="container">
 		<header class="welcome-header">
-			<%-- 言語選択セレクトボックス --%>
 			<div class="lang-switcher"
 				style="text-align: right; margin-bottom: 10px;">
 				<select name="lang" form="orderForm"
 					style="padding: 5px; border-radius: 5px; cursor: pointer;">
-					<option value="ja">日本語 / Japanese</option>
-					<option value="en">English / 英語</option>
+					<option value="ja"
+						${pageContext.response.locale.language == 'ja' ? 'selected' : ''}>日本語
+						/ Japanese</option>
+					<option value="en"
+						${pageContext.response.locale.language == 'en' ? 'selected' : ''}>English
+						/ 英語</option>
 				</select>
 			</div>
-
 			<h1 class="shop-name">
 				<fmt:message key="label.shop_name" />
 			</h1>
@@ -64,21 +65,26 @@
 		<form action="ToppageServlet" method="post" class="input-form"
 			id="orderForm">
 			<div class="input-area">
+				<%-- ご来店人数 --%>
 				<div class="input-group">
 					<label for="persons"><fmt:message key="label.persons" /></label>
 					<div class="field-wrapper" id="wrapper-persons">
 						<input type="text" name="persons" id="persons" readonly
 							onclick="setActive('persons')" value="${param.persons}"
-							placeholder="0"> <span class="unit"><fmt:message
-								key="label.unit_persons" /></span>
+							placeholder="0"> <span class="unit"> <fmt:message
+								key="label.unit_persons" />
+						</span>
 					</div>
 				</div>
 
+				<%-- テーブル番号 --%>
 				<div class="input-group display-only">
 					<label><fmt:message key="label.table_no" /></label>
 					<div class="field-wrapper readonly-wrapper">
-						<input type="text" value="${sessionScope.fixedTableNo}" readonly
-							placeholder="未設定"> <span class="unit">番</span>
+						<input type="text" value="${sessionScope.fixedTableNo}" readonly>
+						<%-- ★ここが「番」になるように properties と一致させる --%>
+						<span class="unit"> <fmt:message key="label.unit_table_no" />
+						</span>
 					</div>
 					<input type="hidden" name="tableNo"
 						value="${sessionScope.fixedTableNo}">
@@ -107,7 +113,9 @@
 		</form>
 
 		<c:if test="${not empty error}">
-			<div class="error-banner">${error}</div>
+			<div class="error-banner"
+				style="color: red; text-align: center; margin-top: 10px;">
+				${error}</div>
 		</c:if>
 	</div>
 </body>
