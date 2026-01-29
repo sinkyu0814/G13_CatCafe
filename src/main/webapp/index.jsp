@@ -2,34 +2,45 @@
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
+
 <head>
 <meta charset="UTF-8">
-<title>メインメニュー</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>システムメインメニュー</title>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/MainMenu.css">
 </head>
+
 <body>
 
-	<h1>システムメイン画面</h1>
+	<div class="portal-container">
+		<h1>ORDER SYSTEM PORTAL</h1>
 
-	<!-- お客様用画面 -->
-	<form action="ToppageServlet" method="get">
-		<button type="submit">お客様用画面へ</button>
-	</form>
-	<br>
+		<div class="menu-grid">
+			<form action="ToppageServlet" method="get">
+				<button type="submit" class="btn-customer">🍴 お客様用画面（注文）</button>
+			</form>
 
-	<!-- キッチン用画面 -->
-	<form action="KitchenOrderServlet" method="get">
-		<button type="submit">キッチン画面へ</button>
-	</form>
-	<br>
+			<hr>
 
-	<!-- 従業員用（管理用）画面 -->
-	<form action="AddMenuServlet" method="get">
-		<button type="submit">管理(Menu登録)画面へ</button>
-	</form>
-	<br>
-	
-	<form action="TableSelectServlet" method="get">
-		<button type="submit">レジ画面へ</button>
-	</form>
+			<form action="KitchenOrderServlet" method="get">
+				<button type="submit" class="btn-staff">🍳 キッチン画面（調理）</button>
+			</form>
+
+			<form action="TableSelectServlet" method="get">
+				<button type="submit" class="btn-staff">💰 レジ画面（会計）</button>
+			</form>
+
+			<form action="AdminServlet" method="get">
+				<button type="submit" class="btn-staff">📊 管理画面（ダッシュボード）</button>
+			</form>
+
+			<form action="LoginServlet" method="get">
+				<button type="submit" class="btn-outline">🔐 ログイン画面へ</button>
+			</form>
+		</div>
+	</div>
+
 </body>
+
 </html>
