@@ -1,31 +1,31 @@
 package controller;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import database.DBManager;
+import database.AccountingDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import model.dto.MenuOptionDTO;
+import model.service.AccountingService;
 import viewmodel.OrderItem;
 
 @WebServlet("/AccountingServlet")
 public class AccountingServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
+	// DAOとServiceをインスタンス化
+	private final AccountingDAO accountingDAO = new AccountingDAO();
+	private final AccountingService accountingService = new AccountingService();
+
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+
 		HttpSession session = request.getSession(false);
 		if (session == null || session.getAttribute("isLoggedIn") == null) {
 			response.sendRedirect("LoginServlet");
@@ -39,69 +39,26 @@ public class AccountingServlet extends HttpServlet {
 			return;
 		}
 
-		List<OrderItem> list = new ArrayList<>();
-		int totalAmount = 0;
-		int tableNo = 0;
+		try {
+			// 1. DAOにデータの取得を依頼
+			Map<String, Object> details = accountingDAO.getOrderDetails(orderId);
+			List<OrderItem> list = (List<OrderItem>) details.get("list");
+			int tableNo = (int) details.get("tableNo");
 
-		try (Connection conn = DBManager.getConnection()) {
-			// ★ status が NEW または CHECKOUT_REQUEST のものを表示
-			String sql = """
-					SELECT o.table_no,
-					       oi.order_item_id,
-					       oi.goods_name,
-					       oi.price,
-					       oi.quantity,
-					       oio.option_name,
-					       oio.option_price
-					FROM orders o
-					JOIN order_items oi ON o.order_id = oi.order_id
-					LEFT JOIN order_item_options oio ON oi.order_item_id = oio.order_item_id
-					WHERE o.order_id = ? AND o.status IN ('NEW', 'CHECKOUT_REQUEST')
-					ORDER BY oi.order_item_id ASC
-					""";
+			// 2. Serviceに計算を依頼
+			int totalAmount = accountingService.calculateTotal(list);
 
-			try (PreparedStatement ps = conn.prepareStatement(sql)) {
-				ps.setInt(1, orderId);
-				try (ResultSet rs = ps.executeQuery()) {
-					Map<Integer, OrderItem> itemMap = new LinkedHashMap<>();
-					while (rs.next()) {
-						int itemId = rs.getInt("order_item_id");
-						tableNo = rs.getInt("table_no");
+			// 3. 結果をリクエストスコープにセット
+			request.setAttribute("orderList", list);
+			request.setAttribute("totalAmount", totalAmount);
+			request.setAttribute("tableNo", tableNo);
+			request.setAttribute("orderId", orderId);
 
-						OrderItem item = itemMap.get(itemId);
-						if (item == null) {
-							item = new OrderItem();
-							item.setOrderItemId(itemId);
-							item.setName(rs.getString("goods_name"));
-							item.setPrice(rs.getInt("price"));
-							item.setQuantity(rs.getInt("quantity"));
-							item.setSelectedOptions(new ArrayList<>());
-							itemMap.put(itemId, item);
-						}
+			request.getRequestDispatcher("/WEB-INF/jsp/Accounting.jsp").forward(request, response);
 
-						String optName = rs.getString("option_name");
-						if (optName != null) {
-							MenuOptionDTO opt = new MenuOptionDTO();
-							opt.setOptionName(optName);
-							opt.setOptionPrice(rs.getInt("option_price"));
-							item.getSelectedOptions().add(opt);
-						}
-					}
-					list = new ArrayList<>(itemMap.values());
-					for (OrderItem oi : list) {
-						totalAmount += (oi.getPrice() + oi.getOptionTotalPrice()) * oi.getQuantity();
-					}
-				}
-			}
 		} catch (Exception e) {
 			throw new ServletException(e);
 		}
-
-		request.setAttribute("orderList", list);
-		request.setAttribute("totalAmount", totalAmount);
-		request.setAttribute("tableNo", tableNo);
-		request.setAttribute("orderId", orderId);
-		request.getRequestDispatcher("/WEB-INF/jsp/Accounting.jsp").forward(request, response);
 	}
 
 	@Override
@@ -110,63 +67,73 @@ public class AccountingServlet extends HttpServlet {
 
 		String action = request.getParameter("action");
 		HttpSession session = request.getSession(false);
+
+		// ログインチェック
 		if (session == null || session.getAttribute("isLoggedIn") == null) {
 			response.sendRedirect("LoginServlet");
 			return;
 		}
 
-		if ("startAccounting".equals(action)) {
-			String tableStr = request.getParameter("tableNumber");
-			if (tableStr == null || tableStr.isEmpty()) {
-				response.sendRedirect("TableSelectServlet");
+		try {
+			// ケース1: 会計開始（テーブル選択からの遷移）
+			if ("startAccounting".equals(action)) {
+				handleStartAccounting(request, response, session);
 				return;
 			}
-			int tableNo = Integer.parseInt(tableStr.replace("番", ""));
 
-			try (Connection conn = DBManager.getConnection()) {
-				// ★ 会計待ちはどちらのステータスでも開始できるようにする
-				String sql = "SELECT order_id FROM orders WHERE table_no = ? AND status IN ('NEW', 'CHECKOUT_REQUEST')";
-				try (PreparedStatement ps = conn.prepareStatement(sql)) {
-					ps.setInt(1, tableNo);
-					try (ResultSet rs = ps.executeQuery()) {
-						if (rs.next()) {
-							session.setAttribute("orderId", rs.getInt("order_id"));
-							session.setAttribute("tableNo", tableNo);
-							response.sendRedirect("AccountingServlet");
-						} else {
-							session.setAttribute("tableSelectError", tableNo + "番テーブルは現在空席です。");
-							response.sendRedirect("TableSelectServlet");
-						}
-					}
-				}
-			} catch (Exception e) {
-				throw new ServletException(e);
-			}
-			return;
-		}
+			// ケース2: 会計確定（支払い完了）
+			handleCompleteAccounting(request, response, session);
 
-		// 会計確定
-		Integer orderId = (Integer) session.getAttribute("orderId");
-		Integer tableNo = (Integer) session.getAttribute("tableNo");
-
-		String totalStr = request.getParameter("totalAmount");
-		String depositStr = request.getParameter("deposit");
-
-		int totalAmount = (totalStr != null && !totalStr.isEmpty()) ? Integer.parseInt(totalStr) : 0;
-		int deposit = (depositStr != null && !depositStr.isEmpty()) ? Integer.parseInt(depositStr) : 0;
-		int change = deposit - totalAmount;
-
-		try (Connection conn = DBManager.getConnection()) {
-			// ステータスをPAIDにする
-			String sql = "UPDATE orders SET status = 'PAID' WHERE order_id = ?";
-			try (PreparedStatement ps = conn.prepareStatement(sql)) {
-				ps.setInt(1, orderId);
-				ps.executeUpdate();
-			}
 		} catch (Exception e) {
 			throw new ServletException(e);
 		}
+	}
 
+	/**
+	 * 会計開始処理
+	 */
+	private void handleStartAccounting(HttpServletRequest request, HttpServletResponse response, HttpSession session)
+			throws Exception {
+		String tableStr = request.getParameter("tableNumber");
+		if (tableStr == null || tableStr.isEmpty()) {
+			response.sendRedirect("TableSelectServlet");
+			return;
+		}
+
+		int tableNo = Integer.parseInt(tableStr.replace("番", ""));
+
+		// DAOで注文IDを検索
+		int orderId = accountingDAO.findActiveOrderIdByTable(tableNo);
+
+		if (orderId != -1) {
+			session.setAttribute("orderId", orderId);
+			session.setAttribute("tableNo", tableNo);
+			response.sendRedirect("AccountingServlet");
+		} else {
+			session.setAttribute("tableSelectError", tableNo + "番テーブルは現在空席です。");
+			response.sendRedirect("TableSelectServlet");
+		}
+	}
+
+	/**
+	 * 会計確定処理
+	 */
+	private void handleCompleteAccounting(HttpServletRequest request, HttpServletResponse response, HttpSession session)
+			throws Exception {
+
+		Integer orderId = (Integer) session.getAttribute("orderId");
+		Integer tableNo = (Integer) session.getAttribute("tableNo");
+
+		int totalAmount = Integer.parseInt(request.getParameter("totalAmount"));
+		int deposit = Integer.parseInt(request.getParameter("deposit"));
+
+		// Serviceでお釣りを計算
+		int change = accountingService.calculateChange(deposit, totalAmount);
+
+		// DAOでステータスを更新
+		accountingDAO.updateStatusToPaid(orderId);
+
+		// 結果をセットして完了画面へ
 		request.setAttribute("tableNo", tableNo);
 		request.setAttribute("totalAmount", totalAmount);
 		request.setAttribute("deposit", deposit);
