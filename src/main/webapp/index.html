@@ -1,39 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>システムメインメニュー</title>
+	<title>Store Portal</title>
 	<link rel="stylesheet" href="assets/css/MainMenu.css">
 </head>
 
 <body>
 
 	<div class="portal-container">
-		<h1>ORDER SYSTEM PORTAL</h1>
+		<header>
+			<h1>STORE SYSTEM</h1>
+		</header>
 
-		<div class="menu-grid">
+		<div class="menu-stack">
 			<form action="ToppageServlet" method="get">
-				<button type="submit" class="btn-customer">🍴 お客様用画面（注文）</button>
+				<button type="submit" class="menu-card btn-customer">
+					<span class="card-icon">🍴</span>
+					<span class="card-content">
+						<span class="card-title">お客様用画面</span>
+						<span class="card-desc">セルフオーダーを開始します</span>
+					</span>
+				</button>
 			</form>
 
-			<hr>
-
 			<form action="KitchenOrderServlet" method="get">
-				<button type="submit" class="btn-staff">🍳 キッチン画面（調理）</button>
+				<button type="submit" class="menu-card btn-staff">
+					<span class="card-icon">🍳</span>
+					<span class="card-content">
+						<span class="card-title">キッチン調理</span>
+						<span class="card-desc">注文の確認と調理ステータス管理</span>
+					</span>
+				</button>
 			</form>
 
 			<form action="TableSelectServlet" method="get">
-				<button type="submit" class="btn-staff">💰 レジ画面（会計）</button>
+				<button type="submit" class="menu-card btn-staff">
+					<span class="card-icon">💰</span>
+					<span class="card-content">
+						<span class="card-title">レジ・会計</span>
+						<span class="card-desc">お会計処理とテーブル状況確認</span>
+					</span>
+				</button>
 			</form>
 
 			<form action="AdminServlet" method="get">
-				<button type="submit" class="btn-staff">📊 管理画面（ダッシュボード）</button>
+				<button type="submit" class="menu-card btn-admin">
+					<span class="card-icon">📊</span>
+					<span class="card-content">
+						<span class="card-title">店舗管理</span>
+						<span class="card-desc">売上分析・メニューの設定変更</span>
+					</span>
+				</button>
 			</form>
+		</div>
 
+		<div class="login-link">
 			<form action="LoginServlet" method="get">
-				<button type="submit" class="btn-outline">🔐 ログイン画面へ</button>
+				<button type="submit" class="btn-login">⚙️ 管理者ログイン画面へ</button>
 			</form>
 		</div>
 	</div>
