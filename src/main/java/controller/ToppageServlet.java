@@ -58,8 +58,16 @@ public class ToppageServlet extends HttpServlet {
 		// JSTLのfmtタグ用ロケールを設定
 		Config.set(session, Config.FMT_LOCALE, locale);
 
+		// ★追加：言語切り替えのみの実行かチェック
+		// JSP側のJavaScriptから送られてくるフラグを判定
+		String langChange = request.getParameter("langChange");
+		if ("true".equals(langChange)) {
+			// 言語を切り替えて、そのまま入力画面を再表示（DB処理へ行かない）
+			request.getRequestDispatcher("/WEB-INF/jsp/FirstWindow.jsp").forward(request, response);
+			return;
+		}
+
 		// 2. プロパティファイル(messages)を読み込むための準備
-		// パッケージ名を含めて指定 (properties.messages)
 		ResourceBundle bundle = ResourceBundle.getBundle("properties.messages", locale);
 
 		String personsStr = request.getParameter("persons");
@@ -70,7 +78,7 @@ public class ToppageServlet extends HttpServlet {
 			return;
 		}
 
-		// --- バリデーションチェック（メッセージをプロパティから取得） ---
+		// --- バリデーションチェック ---
 
 		// 未入力チェック
 		if (personsStr == null || personsStr.isEmpty()) {

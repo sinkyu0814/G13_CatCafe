@@ -154,9 +154,9 @@
 							</div>
 
 							<c:if test="${c.quantity >= 15}">
-								<span class="max-qty-msg">※最大15個まで</span>
+								<span class="max-qty-msg"><fmt:message
+										key="label.max_qty_msg" /></span>
 							</c:if>
-							<%-- JSでチェックするために現在の個数を隠し持っておく --%>
 							<input type="hidden" class="js-item-qty" value="${c.quantity}">
 						</div>
 					</div>
@@ -170,7 +170,6 @@
 					</button>
 				</form>
 
-				<%-- ★修正：onsubmitでJavaScriptを実行し、NGなら送信をキャンセルする --%>
 				<form action="ConfirmOrderServlet" method="post"
 					onsubmit="return validateOrder();">
 					<button type="submit" class="side-btn order-btn">
@@ -192,16 +191,18 @@
 			}
 		}
 
-		// ★追加：注文確定前のチェック関数
 		function validateOrder() {
 			const qtyElements = document.querySelectorAll('.js-item-qty');
+			// プロパティファイルからJavaScriptへメッセージを渡す
+			const errorMsg = "<fmt:message key='alert.max_qty_over' />";
+			
 			for (let el of qtyElements) {
 				if (parseInt(el.value) > 15) {
-					alert("15個を超えている商品があります。数量を調整してください。");
-					return false; // 送信を中止
+					alert(errorMsg);
+					return false;
 				}
 			}
-			return true; // 送信を実行
+			return true;
 		}
 	</script>
 </body>

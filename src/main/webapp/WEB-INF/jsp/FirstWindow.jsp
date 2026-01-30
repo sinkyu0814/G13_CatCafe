@@ -14,7 +14,10 @@
 <script>
 	let activeInput = null;
 	function setActive(id) {
-		document.getElementById('persons').classList.remove('active-field');
+		const inputField = document.getElementById('persons');
+		if (inputField) {
+			inputField.classList.remove('active-field');
+		}
 		activeInput = document.getElementById(id);
 		activeInput.classList.add('active-field');
 	}
@@ -32,6 +35,20 @@
 			return;
 		activeInput.value = activeInput.value.slice(0, -1);
 	}
+
+	// ★追加：言語が変更されたら即座にフォームを送信して再読み込みさせる
+	function changeLanguage() {
+		const form = document.getElementById('orderForm');
+		// 注文開始ではなく「言語切り替え」であることをサーバーに伝えるためのフラグ（任意）
+		const hiddenInput = document.createElement('input');
+		hiddenInput.type = 'hidden';
+		hiddenInput.name = 'langChange';
+		hiddenInput.value = 'true';
+		form.appendChild(hiddenInput);
+
+		form.submit();
+	}
+
 	window.onload = function() {
 		setActive('persons');
 	};
@@ -42,8 +59,9 @@
 		<header class="welcome-header">
 			<div class="lang-switcher"
 				style="text-align: right; margin-bottom: 10px;">
-				<select name="lang" form="orderForm"
-					style="padding: 5px; border-radius: 5px; cursor: pointer;">
+				<%-- ★修正：onchange="changeLanguage()" を追加 --%>
+				<select name="lang" form="orderForm" onchange="changeLanguage()"
+					style="padding: 10px; border-radius: 5px; cursor: pointer; font-size: 1em;">
 					<option value="ja"
 						${pageContext.response.locale.language == 'ja' ? 'selected' : ''}>日本語
 						/ Japanese</option>
@@ -65,7 +83,6 @@
 		<form action="ToppageServlet" method="post" class="input-form"
 			id="orderForm">
 			<div class="input-area">
-				<%-- ご来店人数 --%>
 				<div class="input-group">
 					<label for="persons"><fmt:message key="label.persons" /></label>
 					<div class="field-wrapper" id="wrapper-persons">
@@ -77,12 +94,10 @@
 					</div>
 				</div>
 
-				<%-- テーブル番号 --%>
 				<div class="input-group display-only">
 					<label><fmt:message key="label.table_no" /></label>
 					<div class="field-wrapper readonly-wrapper">
 						<input type="text" value="${sessionScope.fixedTableNo}" readonly>
-						<%-- ★ここが「番」になるように properties と一致させる --%>
 						<span class="unit"> <fmt:message key="label.unit_table_no" />
 						</span>
 					</div>
@@ -114,7 +129,7 @@
 
 		<c:if test="${not empty error}">
 			<div class="error-banner"
-				style="color: red; text-align: center; margin-top: 10px;">
+				style="color: red; text-align: center; margin-top: 10px; font-weight: bold;">
 				${error}</div>
 		</c:if>
 	</div>

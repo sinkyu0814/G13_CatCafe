@@ -8,10 +8,48 @@
 <title>店員用：席選択画面</title>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/TableSelect.css">
+<style>
+/* 追加：リセットボタンの配置と縦長デザインのみ */
+.admin-section {
+	position: absolute;
+	top: 250px; /* 1番テーブルの上端に合わせる */
+	left: 15px;
+	z-index: 999;
+}
+
+.btn-reset {
+	width: 60px;
+	height: 120px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	writing-mode: vertical-rl;
+	text-orientation: upright;
+	letter-spacing: 0.2em;
+	font-size: 0.8rem;
+	font-weight: bold;
+	cursor: pointer;
+	background-color: rgba(189, 195, 199, 0.3);
+	color: #95a5a6;
+	border: 1px solid rgba(189, 195, 199, 0.5);
+	border-radius: 8px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+	transition: all 0.3s;
+}
+
+.btn-reset:hover {
+	background-color: rgba(231, 76, 60, 0.2);
+	color: #e74c3c;
+	border-color: rgba(231, 76, 60, 0.5);
+}
+</style>
 </head>
 <body>
-	<div class="header-title">
-		<h1>席管理・会計</h1>
+	<div class="admin-section">
+		<form action="ResetAllTablesServlet" method="POST"
+			onsubmit="return confirmReset()">
+			<button type="submit" class="btn-reset">一括リセット</button>
+		</form>
 	</div>
 
 	<div class="legend-container">
@@ -45,7 +83,6 @@
 				String status = (tableStatusMap != null) ? tableStatusMap.get(i) : null;
 				boolean isOccupied = (status != null);
 
-				// クラス名と表示テキストの判定（元のロジックを維持）
 				String tableClass = "table-unit empty";
 				String statusText = "空席";
 
@@ -72,11 +109,8 @@
 		</div>
 	</form>
 
-	<div class="admin-section">
-		<form action="ResetAllTablesServlet" method="POST"
-			onsubmit="return confirmReset()">
-			<button type="submit" class="btn-reset">【管理者】全テーブル一括リセット</button>
-		</form>
+	<div class="admin-section"
+		style="position: static; margin-top: 20px; text-align: center; display: none;">
 	</div>
 
 	<script>
@@ -88,7 +122,9 @@
         const refreshInterval = setInterval(() => {
             if (!timerPaused) {
                 timeLeft--;
-                timerElement.innerText = timeLeft;
+                if (timerElement) {
+                    timerElement.innerText = timeLeft;
+                }
                 if (timeLeft <= 0) {
                     location.reload();
                 }
@@ -96,8 +132,10 @@
         }, 1000);
 
         function selectTable(id, occupied) {
-            timerPaused = true; // 選択中はリロード停止
-            timerElement.innerText = "停止中";
+            timerPaused = true; 
+            if (timerElement) {
+                timerElement.innerText = "停止中";
+            }
 
             document.querySelectorAll('.table-unit').forEach(el => {
                 el.classList.remove('selected-table');
