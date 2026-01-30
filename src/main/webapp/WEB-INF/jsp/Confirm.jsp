@@ -10,6 +10,36 @@
 <title><fmt:message key="label.product_confirm" /></title>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/confirm.css">
+
+<script>
+	/**
+	 * モーニングメニューのバリデーション
+	 * カテゴリが「モーニング」の場合、オプションが1つ以上選択されているかチェックします。
+	 */
+	function validateMorningOption() {
+		const category = document.querySelector('input[name="category"]').value;
+		const checkboxes = document.querySelectorAll('input[name="optionIds"]');
+
+		// カテゴリが「モーニング」であるか判定
+		if (category === "Morning") {
+			let isChecked = false;
+
+			// 1つでもチェックされているか確認
+			for (let i = 0; i < checkboxes.length; i++) {
+				if (checkboxes[i].checked) {
+					isChecked = true;
+					break;
+				}
+			}
+
+			if (!isChecked) {
+				alert("モーニングメニューはセットオプション（ドリンク等）の選択が必須です。");
+				return false; // 送信をブロック
+			}
+		}
+		return true; // 送信を許可
+	}
+</script>
 </head>
 <body>
 	<div class="container">
@@ -35,7 +65,7 @@
 				<form action="CartAddServlet" method="post" class="add-to-cart-form"
 					onsubmit="return validateMorningOption()">
 					<input type="hidden" name="id" value="${menu.id}"> <input
-						type="hidden" name="category" value="${param.category}">
+						type="hidden" name="category" value="${menu.category}">
 
 					<div class="quantity-selector">
 						<label for="quantity"><fmt:message key="label.quantity" />：</label>
@@ -64,8 +94,9 @@
 						<fmt:message key="button.add_to_cart" />
 					</button>
 				</form>
+
 				<form action="ListServlet" method="get" class="back-form">
-					<input type="hidden" name="category" value="${param.category}">
+					<input type="hidden" name="category" value="${menu.category}">
 					<button type="submit" class="back-button">
 						<fmt:message key="button.back" />
 					</button>
