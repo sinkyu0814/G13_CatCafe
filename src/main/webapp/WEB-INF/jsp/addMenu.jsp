@@ -27,7 +27,9 @@
 					<label>商品名</label> <input type="text" name="name" required>
 				</div>
 				<div class="input-field">
-					<label>価格 (円)</label> <input type="number" name="price" required>
+					<%-- ★価格制限 10,000円 --%>
+					<label>価格 (円)</label> <input type="number" name="price" min="0"
+						max="10000" required>
 				</div>
 				<div class="input-field">
 					<label>初期数量</label> <input type="number" name="quantity"
@@ -79,7 +81,6 @@
 									class="thumb" alt="商品画像"></td>
 								<td>
 									<div class="action-btns">
-										<%-- ★ 修正：編集ボタンをループ内の正しい場所に配置 --%>
 										<a href="EditMenuServlet?id=${menu.id}"
 											class="btn-sm btn-info"
 											style="text-decoration: none; text-align: center; display: inline-block; line-height: 24px; margin-bottom: 5px;">編集</a>
@@ -106,8 +107,10 @@
 											class="opt-add-form">
 											<input type="hidden" name="menuId" value="${menu.id}">
 											<input type="text" name="optionName" placeholder="名前"
-												required> <input type="number" name="optionPrice"
-												placeholder="円" required>
+												required>
+											<%-- ★オプション価格制限 10,000円 --%>
+											<input type="number" name="optionPrice" placeholder="円"
+												min="0" max="10000" required>
 											<button type="submit">+</button>
 										</form>
 										<ul class="opt-list">

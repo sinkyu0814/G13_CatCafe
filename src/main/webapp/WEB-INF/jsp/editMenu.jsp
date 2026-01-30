@@ -24,8 +24,9 @@
 						value="${menu.name}" required>
 				</div>
 				<div class="input-field">
+					<%-- ★価格制限 10,000円 --%>
 					<label>価格 (円)</label> <input type="number" name="price"
-						value="${menu.price}" required>
+						value="${menu.price}" min="0" max="10000" required>
 				</div>
 				<div class="input-field">
 					<label>在庫数量</label> <input type="number" name="quantity"

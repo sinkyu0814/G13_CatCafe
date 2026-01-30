@@ -22,11 +22,19 @@
 	text-align: center;
 	font-weight: bold;
 }
-/* 無効化されたボタンのスタイル */
+
 .qty-btn:disabled {
 	background-color: #ccc;
 	cursor: not-allowed;
 	opacity: 0.5;
+}
+
+.max-qty-msg {
+	color: #e74c3c;
+	font-size: 0.7em;
+	margin-top: 2px;
+	font-weight: bold;
+	display: block;
 }
 </style>
 </head>
@@ -110,7 +118,7 @@
 
 				<c:forEach var="c" items="${cart}" varStatus="status">
 					<div class="cart-row"
-						style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+						style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
 						<div class="cart-info">
 							<span class="cart-item-name">${c.goodsName}</span>
 							<c:if test="${not empty c.selectedOptions}">
@@ -121,27 +129,35 @@
 						</div>
 
 						<div class="cart-qty-area"
-							style="display: flex; align-items: center; gap: 5px;">
-							<%-- マイナスボタン --%>
-							<form action="UpdateCartServlet" method="post" style="margin: 0;">
-								<input type="hidden" name="index" value="${status.index}">
-								<input type="hidden" name="change" value="-1"> <input
-									type="hidden" name="category" value="${param.category}">
-								<button type="submit" class="qty-btn"
-									style="width: 24px; height: 24px; padding: 0;">-</button>
-							</form>
+							style="display: flex; flex-direction: column; align-items: flex-end;">
+							<div style="display: flex; align-items: center; gap: 5px;">
+								<form action="UpdateCartServlet" method="post"
+									style="margin: 0;">
+									<input type="hidden" name="index" value="${status.index}">
+									<input type="hidden" name="change" value="-1"> <input
+										type="hidden" name="category" value="${param.category}">
+									<button type="submit" class="qty-btn"
+										style="width: 24px; height: 24px; padding: 0;">-</button>
+								</form>
 
-							<span class="cart-item-qty">${c.quantity}</span>
+								<span class="cart-item-qty">${c.quantity}</span>
 
-							<%-- プラスボタン：数量が10以上の場合は disabled にする --%>
-							<form action="UpdateCartServlet" method="post" style="margin: 0;">
-								<input type="hidden" name="index" value="${status.index}">
-								<input type="hidden" name="change" value="1"> <input
-									type="hidden" name="category" value="${param.category}">
-								<button type="submit" class="qty-btn"
-									style="width: 24px; height: 24px; padding: 0;"
-									${c.quantity >= 10 ? 'disabled' : ''}>+</button>
-							</form>
+								<form action="UpdateCartServlet" method="post"
+									style="margin: 0;">
+									<input type="hidden" name="index" value="${status.index}">
+									<input type="hidden" name="change" value="1"> <input
+										type="hidden" name="category" value="${param.category}">
+									<button type="submit" class="qty-btn"
+										style="width: 24px; height: 24px; padding: 0;"
+										${c.quantity >= 15 ? 'disabled' : ''}>+</button>
+								</form>
+							</div>
+
+							<c:if test="${c.quantity >= 15}">
+								<span class="max-qty-msg">※最大15個まで</span>
+							</c:if>
+							<%-- JSでチェックするために現在の個数を隠し持っておく --%>
+							<input type="hidden" class="js-item-qty" value="${c.quantity}">
 						</div>
 					</div>
 				</c:forEach>
@@ -154,7 +170,9 @@
 					</button>
 				</form>
 
-				<form action="ConfirmOrderServlet" method="post">
+				<%-- ★修正：onsubmitでJavaScriptを実行し、NGなら送信をキャンセルする --%>
+				<form action="ConfirmOrderServlet" method="post"
+					onsubmit="return validateOrder();">
 					<button type="submit" class="side-btn order-btn">
 						<fmt:message key="button.order_confirm" />
 					</button>
@@ -172,6 +190,18 @@
 					behavior : 'smooth'
 				});
 			}
+		}
+
+		// ★追加：注文確定前のチェック関数
+		function validateOrder() {
+			const qtyElements = document.querySelectorAll('.js-item-qty');
+			for (let el of qtyElements) {
+				if (parseInt(el.value) > 15) {
+					alert("15個を超えている商品があります。数量を調整してください。");
+					return false; // 送信を中止
+				}
+			}
+			return true; // 送信を実行
 		}
 	</script>
 </body>

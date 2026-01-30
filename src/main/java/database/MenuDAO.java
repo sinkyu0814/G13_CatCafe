@@ -113,7 +113,6 @@ public class MenuDAO {
 		return new ArrayList<>(map.values());
 	}
 
-	// ★ 追加：カテゴリ一覧を取得する
 	public List<String> getCategoryList() {
 		List<String> list = new ArrayList<>();
 		String sql = "SELECT DISTINCT category FROM menus WHERE is_visible = 1 ORDER BY category";
@@ -141,8 +140,12 @@ public class MenuDAO {
 		return dto;
 	}
 
+	// ★修正：価格制限追加
 	public void addMenu(String name, int price, int quantity, String category, InputStream imageStream)
 			throws Exception {
+		if (price > 10000) {
+			throw new Exception("価格は10,000円以下で設定してください。");
+		}
 		String sql = "INSERT INTO menus (menu_id, name, price, quantity, category, image, is_visible) VALUES (menus_seq.nextval, ?, ?, ?, ?, ?, 1)";
 		try (Connection conn = DBManager.getConnection();
 				PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -183,8 +186,12 @@ public class MenuDAO {
 		}
 	}
 
+	// ★修正：価格制限追加
 	public void updateMenu(int id, String name, int price, int quantity, String category, InputStream imageStream)
 			throws Exception {
+		if (price > 10000) {
+			throw new Exception("価格は10,000円以下で設定してください。");
+		}
 		String sql;
 		boolean hasImage = (imageStream != null);
 

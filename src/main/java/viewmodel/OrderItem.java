@@ -8,7 +8,7 @@ import model.dto.MenuOptionDTO;
 
 /**
  * 注文明細表示用ViewModel
- * JSPの ${item.selectedOptions} および ${item.optionTotalPrice} に完全対応させたバージョンです。
+ * 余計な型変更は行わず、計算時のオーバーフローのみ対策したバージョンです。
  */
 public class OrderItem implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -21,7 +21,6 @@ public class OrderItem implements Serializable {
 	private int quantity;
 	private String image;
 
-	// ★ 重要：JSPの ${item.selectedOptions} に合わせるため名前を修正
 	private List<MenuOptionDTO> selectedOptions;
 
 	private Timestamp orderTime;
@@ -31,7 +30,7 @@ public class OrderItem implements Serializable {
 	public OrderItem() {
 	}
 
-	// --- Getter / Setter ---
+	// --- Getter / Setter (型は一切変えていません) ---
 
 	public int getOrderItemId() {
 		return orderItemId;
@@ -89,7 +88,6 @@ public class OrderItem implements Serializable {
 		this.image = image;
 	}
 
-	// ★ 重要：JSPから呼ばれるGetter
 	public List<MenuOptionDTO> getSelectedOptions() {
 		return selectedOptions;
 	}
@@ -124,23 +122,23 @@ public class OrderItem implements Serializable {
 
 	/**
 	 * 小計（商品単価 × 個数）
-	 * JSPで ${item.subtotal} として使用
+	 * ★修正：計算時に一度 long にキャストしてオーバーフローを防ぎ、最後に int に戻します。
 	 */
 	public int getSubtotal() {
-		return this.price * this.quantity;
+		return (int) ((long) this.price * this.quantity);
 	}
 
 	/**
 	 * オプション合計金額
-	 * JSPで ${item.optionTotalPrice} として使用
+	 * ★修正：内部の計算変数を long にし、最後に int に戻します。
 	 */
 	public int getOptionTotalPrice() {
-		int total = 0;
+		long total = 0; // 計算用
 		if (selectedOptions != null) {
 			for (MenuOptionDTO opt : selectedOptions) {
 				total += opt.getOptionPrice();
 			}
 		}
-		return total;
+		return (int) total;
 	}
 }
