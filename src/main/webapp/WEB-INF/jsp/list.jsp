@@ -36,6 +36,14 @@
 	font-weight: bold;
 	display: block;
 }
+
+/* カート合計エリアの微調整 */
+.cart-total-area {
+	padding: 15px;
+	border-top: 2px solid #eee;
+	background: #fafafa;
+	margin-top: auto;
+}
 </style>
 </head>
 <body>
@@ -86,8 +94,9 @@
 								</div>
 								<div class="item-info">
 									<p class="item-name">${m.name}</p>
-									<p class="item-price">${m.price}<fmt:message
-											key="label.unit_table" />
+									<p class="item-price">
+										${m.price}
+										<fmt:message key="label.unit_table" />
 									</p>
 								</div>
 							</a>
@@ -111,6 +120,7 @@
 			<div class="cart-header">
 				<fmt:message key="label.cart" />
 			</div>
+
 			<div class="cart-content">
 				<c:if test="${empty cart and not empty error}">
 					<div class="cart-warning">${error}</div>
@@ -163,6 +173,28 @@
 				</c:forEach>
 			</div>
 
+			<%-- 合計金額表示エリア --%>
+			<div class="cart-total-area">
+				<c:set var="total" value="0" />
+				<c:forEach var="c" items="${cart}">
+					<c:set var="optionTotal" value="0" />
+					<c:forEach var="opt" items="${c.selectedOptions}">
+						<c:set var="optionTotal" value="${optionTotal + opt.optionPrice}" />
+					</c:forEach>
+					<c:set var="total"
+						value="${total + (c.price + optionTotal) * c.quantity}" />
+				</c:forEach>
+
+				<div
+					style="display: flex; justify-content: space-between; align-items: center; font-weight: bold;">
+					<span style="font-size: 0.9em; color: #555;"> <fmt:message
+							key="label.total_amount" />
+					</span> <span style="font-size: 1.2em; color: #e74c3c;"> ¥ <fmt:formatNumber
+							value="${total}" pattern="#,###" />
+					</span>
+				</div>
+			</div>
+
 			<div class="sidebar-footer">
 				<form action="HistoryServlet" method="get">
 					<button type="submit" class="side-btn">
@@ -170,6 +202,7 @@
 					</button>
 				</form>
 
+				<%-- 注文確定フォーム：onsubmitで確認処理を呼ぶ --%>
 				<form action="ConfirmOrderServlet" method="post"
 					onsubmit="return validateOrder();">
 					<button type="submit" class="side-btn order-btn">
@@ -191,9 +224,12 @@
 			}
 		}
 
+		/**
+		 * 注文確定前のバリデーションと確認ダイアログ
+		 */
 		function validateOrder() {
+			// 1. 数量チェック
 			const qtyElements = document.querySelectorAll('.js-item-qty');
-			// プロパティファイルからJavaScriptへメッセージを渡す
 			const errorMsg = "<fmt:message key='alert.max_qty_over' />";
 			
 			for (let el of qtyElements) {
@@ -202,7 +238,16 @@
 					return false;
 				}
 			}
-			return true;
+
+			// 2. カート空チェック
+			if (qtyElements.length === 0) {
+				alert("カートに商品が入っていません。");
+				return false;
+			}
+
+			// 3. 注文確認ダイアログ（プロパティファイルからメッセージ取得）
+			const confirmMsg = "<fmt:message key='confirm.order_submit' />";
+			return confirm(confirmMsg);
 		}
 	</script>
 </body>

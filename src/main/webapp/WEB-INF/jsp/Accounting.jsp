@@ -14,8 +14,15 @@
     Integer orderId = (Integer) request.getAttribute("orderId");
     Integer tableNo = (Integer) request.getAttribute("tableNo");
     List<OrderItem> orderList = (List<OrderItem>) request.getAttribute("orderList");
-    Integer totalAmount = (Integer) request.getAttribute("totalAmount");
-    if (totalAmount == null) totalAmount = 0;
+    
+    // 合計金額がintを超える可能性を考慮してlongとして扱う
+    Object totalObj = request.getAttribute("totalAmount");
+    long totalAmount = 0;
+    if (totalObj instanceof Long) {
+        totalAmount = (Long) totalObj;
+    } else if (totalObj instanceof Integer) {
+        totalAmount = ((Integer) totalObj).longValue();
+    }
 %>
 
 	<div class="page-container">
@@ -31,7 +38,7 @@
 		<div class="grid-container">
 			<div class="order-panel">
 				<div class="total-summary">
-					<span class="label">合計金額</span> <span class="amount">¥ <%=String.format("%, d", totalAmount)%></span>
+					<span class="label">合計金額</span> <span class="amount">¥ <%=String.format("%,d", totalAmount)%></span>
 					<input type="hidden" id="totalAmountValue" value="<%=totalAmount%>">
 				</div>
 
@@ -57,11 +64,11 @@
 										<% } %>
 									</ul> <% } %></td>
 								<td><%=item.getQuantity()%></td>
-								<td style="text-align: right;">¥ <%=item.getPrice() + item.getOptionTotalPrice()%>
+								<td style="text-align: right;">¥ <%=String.format("%,d", (long)item.getPrice() + item.getOptionTotalPrice())%>
 									<% if (item.getQuantity() > 1) { %>
 									<div style="font-size: 0.75em; color: #999;">
 										(小計 ¥
-										<%=(item.getPrice() + item.getOptionTotalPrice()) * item.getQuantity()%>)
+										<%=String.format("%,d", (long)item.getSubtotal())%>)
 									</div> <% } %>
 								</td>
 							</tr>
@@ -116,14 +123,30 @@
 	</div>
 
 	<script>
+		/**
+		 * 数値入力制限の追加
+		 */
 		function inputNumber(num) {
 			const depositInput = document.getElementById('depositInput');
 			let current = depositInput.value;
+
+			// Javaのint最大値 2,147,483,647 を超えないように少し手前（20億）で制限
+			const LIMIT = 2000000000;
+
+			let nextValue;
 			if (current === "0") {
-				depositInput.value = (num === '00') ? "0" : num;
+				nextValue = (num === '00') ? "0" : num.toString();
 			} else {
-				depositInput.value = current + num;
+				nextValue = current + num.toString();
 			}
+
+			// 数値に変換して上限チェック
+			if (parseInt(nextValue) > LIMIT) {
+				alert("預り金額の上限（20億円）を超えています。");
+				return;
+			}
+
+			depositInput.value = nextValue;
 			updateChange();
 		}
 
@@ -132,16 +155,22 @@
 			updateChange();
 		}
 
+		/**
+		 * JavaScript内での計算オーバーフロー対策
+		 */
 		function updateChange() {
-			const total = parseInt(document.getElementById('totalAmountValue').value) || 0;
-			const deposit = parseInt(document.getElementById('depositInput').value) || 0;
+			// BigIntを使用して計算中のオーバーフローを完全に回避
+			const total = BigInt(document.getElementById('totalAmountValue').value || 0);
+			const deposit = BigInt(document.getElementById('depositInput').value || 0);
 			const finishButton = document.getElementById('finishButton');
 			const changeDisplay = document.getElementById('changeDisplay');
 			const hiddenDeposit = document.getElementById('hiddenDeposit');
 
 			const change = deposit - total;
+
+			// 表示更新
 			changeDisplay.innerText = "¥ " + change.toLocaleString();
-			hiddenDeposit.value = deposit;
+			hiddenDeposit.value = deposit.toString();
 
 			if (deposit >= total) {
 				finishButton.classList.remove('btn-disabled');
